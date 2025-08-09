@@ -1,0 +1,106 @@
+programa ejemplo
+procesos
+  proceso depositarFlores(ES f:numero E ca:numero E av:numero)
+  comenzar
+    BloquearEsquina(av,ca)
+    Pos(av,ca)
+    mientras (f>0) & (HayFlorEnLaBolsa)
+      depositarFlor
+      f:=f-1
+    Pos(100,100)
+    LiberarEsquina(av,ca)
+  fin
+areas
+  ciudad: AreaC (1,1,100,100)
+robots
+  robot servidor
+  variables
+    flores,calleI,avI,calle,terminados,av,id:numero
+  comenzar
+    mientras (HayFlorEnLaEsquina)
+      tomarFlor
+    calleI:=100
+    avI:=100
+    terminados:=0
+    EnviarMensaje(1,cliente1)
+    EnviarMensaje(2,cliente2)
+    EnviarMensaje(3,cliente3)
+    mientras (terminados<3)
+      RecibirMensaje(id,*)
+      si (id=1)
+        RecibirMensaje(flores,cliente1)
+        si (flores<>0)
+          RecibirMensaje(calle,cliente1)
+          RecibirMensaje(av,cliente1)    
+          depositarFlores(flores,calle,av)
+          EnviarMensaje(id,cliente1)
+        sino
+          terminados:=terminados+1
+      sino
+        si (id=2)
+          RecibirMensaje(flores,cliente2)
+          si (flores<>0) 
+            RecibirMensaje(calle,cliente2)
+            RecibirMensaje(av,cliente2)
+            depositarFlores(flores,calle,av)
+            EnviarMensaje(id,cliente2)
+          sino
+            terminados:=terminados+1
+        sino
+          si (id=3)
+            RecibirMensaje(flores,cliente3)
+            si (flores<>0)
+              RecibirMensaje(calle,cliente3)
+              RecibirMensaje(av,cliente3)
+              depositarFlores(flores,calle,av)
+              EnviarMensaje(id,cliente3)
+            sino
+              terminados:=terminados+1
+  fin
+  robot cliente
+  variables
+    cantF,id,movimientos,avAct,calleAct,aux:numero
+  comenzar
+    Random(cantF,1,4)
+    movimientos:=0
+    avAct:=PosAv
+    calleAct:=PosCa
+    aux:=cantF
+    RecibirMensaje(id,robotServidor)
+    mientras (movimientos<99)
+      EnviarMensaje(id,robotServidor)
+      EnviarMensaje(cantF,robotServidor)
+      EnviarMensaje((calleAct+1),robotServidor)
+      EnviarMensaje(avAct,robotServidor)
+      RecibirMensaje(id,robotServidor)
+      BloquearEsquina(avAct,(calleAct+1))
+      mover
+      mientras (HayFlorEnLaEsquina)&(cantF>0)
+        tomarFlor
+        cantF:=cantF-1
+      Pos(avAct,calleAct)
+      LiberarEsquina(avAct,(calleAct+1))
+      cantF:=aux
+      mientras (cantF>0)&(movimientos<99)&(HayFlorEnLaBolsa)
+        mover
+        movimientos:=movimientos+1
+        calleAct:=PosCa
+        depositarFlor
+        cantF:=cantF-1
+      Random(cantF,1,4)
+    EnviarMensaje(id,robotServidor)
+    EnviarMensaje(0,robotServidor)
+  fin
+variables
+  cliente1,cliente2,cliente3: cliente
+  robotServidor:servidor
+comenzar
+  AsignarArea(cliente1, ciudad)
+  AsignarArea(cliente2, ciudad)
+  AsignarArea(cliente3, ciudad)
+  AsignarArea(robotServidor, ciudad)
+  Iniciar(robotServidor, 100,100)
+  Iniciar(cliente1, 1,1)
+  Iniciar(cliente2, 2,1)
+  Iniciar(cliente3, 3,1)
+fin

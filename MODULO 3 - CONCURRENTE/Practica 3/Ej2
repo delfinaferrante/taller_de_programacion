@@ -1,0 +1,112 @@
+programa Ej3
+procesos
+  proceso juntarPapeles(ES papeles:numero)
+  comenzar
+    mientras(HayPapelEnLaEsquina)
+      tomarPapel
+      papeles:= papeles+1
+  fin
+  proceso juntarFlores(ES flores:numero)
+  comenzar
+    mientras(HayFlorEnLaEsquina)
+      tomarFlor
+      flores:= flores+1
+  fin
+  proceso girar(E cant:numero)
+  comenzar
+    repetir cant
+      derecha
+  fin
+  proceso dibujarEscalon(E valor:numero)
+  comenzar
+    repetir valor
+      mover
+  fin
+  proceso hacerEscalon(E valor:numero; E giro1:numero; E giro2:numero; E robotF:boolean; ES loQueJunta:numero)
+  comenzar
+    dibujarEscalon(valor)
+    girar(giro1)
+    dibujarEscalon(valor)
+    si(robotF = V)
+      juntarFlores(loQueJunta)
+    sino
+      juntarPapeles(loQueJunta)
+    girar(giro2)
+  fin
+areas
+  ciudad: AreaC (1,1,100,100)
+robots
+  robot recorrido1
+  variables
+    valor, primerGiro,segundoGiro, id,flores:numero
+    robotFlorero:boolean
+  comenzar
+    RecibirMensaje(id, jefe)
+    valor:= 5
+    primerGiro:= 1
+    segundoGiro:= 3
+    flores:= 0
+    robotFlorero:= V
+    repetir 4
+      hacerEscalon(valor, primerGiro,segundoGiro, robotFlorero,flores)
+      valor:= valor-1
+    BloquearEsquina(16,16)
+    hacerEscalon(valor, primerGiro,segundoGiro, robotFlorero,flores)
+    EnviarMensaje(id, jefe)
+    Pos(15,16)
+    LiberarEsquina(16,16)
+    girar(3)
+    valor:= 2
+    repetir 4
+      hacerEscalon(valor,primerGiro,segundoGiro,robotFlorero,flores)
+      valor:= valor+1
+    Informar("cant de flores ", flores)
+  fin
+  robot recorrido2
+  variables
+    valor, primerGiro, segundoGiro, id, papeles:numero
+    robotFlorero:boolean
+  comenzar
+    RecibirMensaje(id, jefe)
+    valor:= 5
+    primerGiro:= 3
+    segundoGiro:= 1
+    robotFlorero:= F
+    papeles:= 0
+    repetir 4
+      hacerEscalon(valor, primerGiro, segundoGiro, robotFlorero, papeles)
+      valor:= valor-1
+    BloquearEsquina(16,16)
+    hacerEscalon(valor,primerGiro,segundoGiro,robotFlorero,papeles)
+    EnviarMensaje(id, jefe)
+    Pos(17,16)
+    LiberarEsquina(16,16)
+    girar(1)
+    valor:= 2
+    repetir 4
+      hacerEscalon(valor,primerGiro,segundoGiro,robotFlorero,papeles)
+      valor:= valor+1
+    Informar("cant de papeles ", papeles)
+  fin
+  robot rjefe
+  variables
+    idGanador, idSegundo:numero
+  comenzar
+    EnviarMensaje(1,robot1)
+    EnviarMensaje(2,robot2)
+    RecibirMensaje(idGanador, *)
+    RecibirMensaje(idSegundo, *)
+    Informar("llego primero el r0b0t ", idGanador)
+  fin
+variables
+  robot1: recorrido1
+  robot2: recorrido2
+  jefe: rjefe
+comenzar
+  AsignarArea(robot1, ciudad)
+  AsignarArea(robot2, ciudad)
+  AsignarArea(jefe,ciudad)
+  Iniciar(robot1, 1,1)
+  Iniciar(robot2, 31,1)
+  Iniciar(jefe, 15, 1)
+fin

@@ -1,0 +1,81 @@
+programa Ej4
+procesos
+  proceso limpiarPapeles
+  comenzar
+    mientras(HayPapelEnLaEsquina)
+      tomarPapel
+  fin
+  proceso limpiarFlores
+  comenzar
+    mientras(HayFlorEnLaEsquina)
+      tomarFlor
+  fin
+  proceso girar(E cant:numero)
+  comenzar
+    repetir cant
+      derecha
+  fin
+  proceso recorrerAv(E estado:boolean)
+  comenzar
+    repetir 99
+      si(estado)
+        limpiarFlores
+      sino
+        limpiarPapeles 
+      mover
+  fin
+  proceso arribaParaAbajo(E estado:boolean)
+  comenzar
+    recorrerAv(estado)
+    girar(3)
+    si(estado)
+      limpiarFlores
+    sino
+      limpiarPapeles
+    mover
+    girar(3)
+  fin
+  proceso abajoParaArriba(E estado:boolean)
+  comenzar
+    recorrerAv(estado)
+    girar(1)
+    si(estado == V)
+      limpiarFlores
+    sino
+      limpiarPapeles
+    mover
+    girar(1)
+  fin
+  proceso limpiarAreas(E estado:boolean)
+  comenzar
+    repetir 12 {en total son 24 av pero 12 de abajo para arriba y 12 en viceversa}
+      abajoParaArriba(estado)
+      arribaParaAbajo(estado)
+  fin
+areas
+  area1: AreaP (1, 1, 25, 100)
+  area2: AreaP (26, 1, 50, 100)
+  area3: AreaP (51, 1, 75, 100)
+  area4: AreaP (76, 1, 100, 100)
+robots
+  robot tipo1
+  comenzar
+    repetir 2
+      limpiarAreas(V) {para que junte flores}
+      Pos(51,1)
+  fin
+  robot tipo2
+  comenzar
+    repetir 2
+      limpiarAreas(F) {para que junte papeles}
+      Pos(76,1)
+  fin
+variables
+  robot1: tipo1
+  robot2: tipo2
+comenzar
+  AsignarArea(robot1, area1)
+  AsignarArea(robot2, area2)
+  Iniciar(robot1, 1, 1)
+  Iniciar(robot2, 26, 1)
+fin

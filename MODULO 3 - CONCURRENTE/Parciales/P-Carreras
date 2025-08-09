@@ -1,0 +1,145 @@
+programa ejemplo
+procesos
+  proceso enviarID
+  comenzar
+    EnviarMensaje(1,r1)
+    EnviarMensaje(2,r2)
+    EnviarMensaje(3,r3)
+    EnviarMensaje(4,r4)
+  fin
+  proceso vaciarBolsa
+  comenzar  
+    mientras (HayFlorEnLaBolsa)
+      depositarFlor
+    mientras (HayPapelEnLaBolsa)
+      depositarPapel
+  fin
+  proceso depositarFlores
+  variables
+    calle,av:numero
+  comenzar
+    calle:=PosCa
+    av:=PosAv
+    BloquearEsquina(1,6)
+    Pos(1,6)
+    mientras (HayFlorEnLaBolsa)
+      depositarFlor
+    Pos(av,calle)
+    LiberarEsquina(1,6)
+  fin
+  proceso depositarPapeles
+  variables
+    calle,av:numero
+  comenzar
+    calle:=PosCa
+    av:=PosAv
+    BloquearEsquina(1,6)
+    Pos(1,6)
+    mientras (HayPapelEnLaBolsa)
+      depositarPapel
+    Pos(av,calle)
+    LiberarEsquina(1,6)
+  fin
+  proceso voltear
+  comenzar
+    repetir 2
+      derecha
+  fin
+areas
+  area1: AreaP (1,1,20,1)
+  area2: AreaP (1,2,20,2)
+  area3: AreaP (1,3,20,3)
+  area4: AreaP (1,4,20,4)
+  oficina: AreaP (1,5,1,5)
+  deposito: AreaPC (1,6,1,6)
+robots
+  robot corredor
+  variables
+    id:numero
+    seguir:boolean
+  comenzar
+    vaciarBolsa
+    derecha
+    mover
+    RecibirMensaje(id,rJefe) {inicia la carrera}
+    repetir 18
+      si (HayFlorEnLaEsquina)
+        tomarFlor
+      mover
+    depositarFlores
+    EnviarMensaje(id,rJefe)
+    RecibirMensaje(seguir,rJefe)
+    si (seguir)
+      voltear
+      repetir 19
+        si (HayPapelEnLaEsquina)
+          tomarPapel
+        mover
+      depositarPapeles
+      EnviarMensaje(id,rJefe)
+  fin
+  robot fiscalizador
+  variables
+    finalista1,finalista2:numero
+    basura:numero
+    ganador:numero
+    continuar:boolean
+  comenzar
+    continuar:=V
+    enviarID
+    RecibirMensaje(finalista1,*)
+    RecibirMensaje(finalista2,*)
+    repetir 2
+      RecibirMensaje(basura,*)
+      si (basura=1)
+        EnviarMensaje(F,r1)
+      sino
+        si (basura=2)
+          EnviarMensaje(F,r2)
+        sino
+          si (basura=3)
+            EnviarMensaje(F,r3)
+          sino
+            EnviarMensaje(F,r4)
+    si (finalista1=1)
+      EnviarMensaje(continuar,r1)
+    sino
+      si (finalista1=2)
+        EnviarMensaje(continuar,r2)
+      sino
+        si (finalista1=3)
+          EnviarMensaje(continuar,r3)
+        sino
+          EnviarMensaje(continuar,r4)
+    si (finalista2=1)
+      EnviarMensaje(continuar,r1)
+    sino
+      si (finalista2=2)
+        EnviarMensaje(continuar,r2)
+      sino
+        si (finalista2=3)
+          EnviarMensaje(continuar,r3)
+        sino
+          EnviarMensaje(continuar,r4)
+    RecibirMensaje(ganador,*)
+    Informar(ganador)
+  fin
+variables
+  r1,r2,r3,r4: corredor
+  rJefe: fiscalizador
+comenzar
+  AsignarArea(r1, area1)
+  AsignarArea(r2, area2)
+  AsignarArea(r3, area3)
+  AsignarArea(r4, area4)
+  AsignarArea(r1, deposito)
+  AsignarArea(r2, deposito)
+  AsignarArea(r3, deposito)
+  AsignarArea(r4, deposito)
+  AsignarArea(rJefe, oficina)
+  Iniciar(r1, 1,1)
+  Iniciar(r2, 1,2)
+  Iniciar(r3, 1,3)
+  Iniciar(r4, 1,4)
+  Iniciar(rJefe, 1,5)
+fin

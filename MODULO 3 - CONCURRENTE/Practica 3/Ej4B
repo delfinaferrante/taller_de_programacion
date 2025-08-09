@@ -1,0 +1,78 @@
+programa Ej4B
+procesos
+  proceso recolectarFlores(ES flores:numero)
+  comenzar
+    mientras(HayFlorEnLaEsquina)
+      tomarFlor
+      flores:= flores+1
+  fin
+  proceso recolectarFlor(ES flores:numero)
+  comenzar
+    tomarFlor
+    flores:= flores+1
+  fin
+areas
+  ciudad: AreaC (1,1,12,12)
+robots
+  robot recolectores
+  variables
+    avInicio,calleInicio,id,flores:numero
+    hayFlores:boolean
+  comenzar
+    avInicio:= PosAv
+    calleInicio:= PosCa
+    hayFlores:= V
+    flores:= 0
+    RecibirMensaje(id,rcoordi)
+    mientras(hayFlores = V)
+      BloquearEsquina(10,10)
+      Pos(10,10)
+      si(HayFlorEnLaEsquina)
+        recolectarFlor(flores)
+      sino
+        hayFlores:= F
+      BloquearEsquina(11,11)
+      Pos(avInicio,calleInicio)
+      LiberarEsquina(10,10)
+      Pos(11,11)
+      si(HayFlorEnLaBolsa)
+        depositarFlor
+      Pos(avInicio,calleInicio)
+      LiberarEsquina(11,11)
+    si~(hayFlores)
+      EnviarMensaje(id,rcoordi) {avisa que finalizo la recoleccion}
+  fin
+  robot coordinador
+  variables
+    cantFlores,numRobot:numero
+  comenzar
+    EnviarMensaje(1,r1)
+    EnviarMensaje(2,r2)
+    EnviarMensaje(3,r3)
+    EnviarMensaje(4,r4)
+    cantFlores:= 0
+    repetir 4
+      RecibirMensaje(numRobot, *)
+    Informar("el que finalizo ultimo fue el r0b0t", numRobot)
+    BloquearEsquina(11,11)
+    Pos(11,11)
+    recolectarFlores(cantFlores)
+    Pos(1,1)
+    LiberarEsquina(11,11)
+    Informar("total de flores ", cantFlores)
+  fin
+variables
+  r1,r2,r3,r4: recolectores
+  rcoordi: coordinador
+comenzar
+  AsignarArea(r1, ciudad)
+  AsignarArea(r2, ciudad)
+  AsignarArea(r3, ciudad)
+  AsignarArea(r4, ciudad)
+  AsignarArea(rcoordi, ciudad)
+  Iniciar(r1, 9,9)
+  Iniciar(r2, 9,10)
+  Iniciar(r3, 9,11)
+  Iniciar(r4, 9,12)
+  Iniciar(rcoordi, 1,1)
+fin

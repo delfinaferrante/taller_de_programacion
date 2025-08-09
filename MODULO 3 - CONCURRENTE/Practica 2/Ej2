@@ -1,0 +1,81 @@
+programa Ej2
+procesos
+  proceso girar(E cant:numero)
+  comenzar
+    repetir cant
+      derecha
+  fin
+  proceso compararFloresYPapeles(E flores:numero; E papeles:numero; ES cant:numero)
+  comenzar
+    si(flores > papeles)
+      cant:= cant+1
+  fin
+  proceso juntarPapeles(ES papeles:numero)
+  comenzar
+    mientras(HayPapelEnLaEsquina)
+      tomarPapel
+      papeles:=papeles+1
+  fin
+  proceso juntarFlores(ES flores:numero)
+  comenzar
+    mientras(HayFlorEnLaEsquina)
+      tomarFlor
+      flores:=flores+1
+  fin
+  proceso hacerEscalon(E ancho:numero; E alto:numero; ES cantEscalones:numero; ES flores:numero; ES papeles:numero)
+  comenzar
+    repetir alto
+      juntarFlores(flores)
+      juntarPapeles(papeles)
+      mover
+    girar(1)
+    juntarFlores(flores)
+    juntarPapeles(papeles)
+    mover
+    si(HayFlorEnLaEsquina)
+      juntarFlores(flores)
+    si(HayPapelEnLaEsquina)
+      juntarPapeles(papeles)
+    girar(3)
+  fin
+areas
+  areaEscalera: AreaPC (2, 1, 20, 25)
+  areaJefe: AreaP (1, 1, 1, 1)
+robots
+  robot escalera
+  variables
+    alto, ancho, cantEscalones, flores, papeles:numero
+  comenzar
+    cantEscalones:= 0
+    flores:= 0
+    papeles:=0
+    ancho:= 1
+    repetir 4
+      Random(alto, 1, 5)
+      hacerEscalon(ancho,alto,cantEscalones, flores, papeles)   
+      compararFloresYPapeles(flores,papeles,cantEscalones)
+    EnviarMensaje(cantEscalones, robotJefe)
+  fin
+  robot jefe
+  variables
+    suma, cantEscalones:numero
+  comenzar
+    suma:=0
+    repetir 3
+      RecibirMensaje(cantEscalones, *)
+      suma:= suma + cantEscalones 
+    Informar("escalones con mas flores que papeles ", suma)
+  fin
+variables
+  robot1, robot2, robot3: escalera
+  robotJefe: jefe
+comenzar
+  AsignarArea(robot1, areaEscalera)
+  AsignarArea(robot2, areaEscalera)
+  AsignarArea(robot3, areaEscalera)
+  AsignarArea(robotJefe, areaJefe)
+  Iniciar(robot1, 2, 1)
+  Iniciar(robot2, 7, 1)
+  Iniciar(robot3, 12, 1)
+  Iniciar(robotJefe, 1, 1)
+fin

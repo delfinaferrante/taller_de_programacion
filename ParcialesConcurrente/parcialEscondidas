@@ -1,0 +1,96 @@
+programa parcialEscondidas
+procesos
+  proceso envioMensajes(E id:numero; E aux:boolean;ES encontre:boolean)
+  comenzar
+    si(id = 1)
+      EnviarMensaje(aux, r2)
+      EnviarMensaje(aux, r3)
+      EnviarMensaje(aux, jefe)
+      RecibirMensaje(encontre, r2)
+      RecibirMensaje(encontre, r3)
+    sino
+      si(id = 2)
+        EnviarMensaje(aux, r1)
+        EnviarMensaje(aux, r3)
+        EnviarMensaje(aux, jefe)
+        RecibirMensaje(encontre, r1)
+        RecibirMensaje(encontre, r3)
+      sino
+        EnviarMensaje(aux, r1)
+        EnviarMensaje(aux, r2)
+        EnviarMensaje(aux, jefe)
+        RecibirMensaje(encontre, r1)
+        RecibirMensaje(encontre, r2)
+  fin
+  proceso buscarFlor(E id:numero;ES encontre:boolean)
+  variables
+    aux:boolean
+  comenzar
+    si(HayFlorEnLaEsquina)
+      tomarFlor
+      aux:= V
+      envioMensajes(id, aux,encontre)
+    sino
+      aux:= F
+      envioMensajes(id, aux,encontre)
+  fin
+  proceso esconderFlor(E av:numero; E ca:numero)
+  comenzar
+    Pos(av,ca)
+    depositarFlor
+    Pos(4,4)
+    EnviarMensaje(0, r1)
+    EnviarMensaje(0, r2)
+    EnviarMensaje(0, r3)
+  fin
+areas
+  ciudad: AreaC (1,1,100,100)
+robots
+  robot buscadores
+  variables
+    av,ca,avIni,caIni,id,x:numero
+    encontre:boolean
+  comenzar
+    RecibirMensaje(id, jefe)
+    avIni:= PosAv 
+    caIni:= PosCa
+    encontre:= F
+    RecibirMensaje(x, jefe)
+    mientras(encontre = F)
+      Random(av,10,13)
+      Random(ca,10,13)
+      BloquearEsquina(av,ca)
+      Pos(av,ca)
+      buscarFlor(id,encontre)
+      Pos(avIni,caIni)
+      LiberarEsquina(av,ca)   
+  fin
+  robot escondedor
+  variables
+    av,ca:numero
+    encontre: boolean
+  comenzar
+    EnviarMensaje(1,r1)
+    EnviarMensaje(2,r2)
+    EnviarMensaje(3,r3)
+    encontre:= F
+    Random(av,10,13)
+    Random(ca,10,13)
+    esconderFlor(av,ca)  
+    mientras(encontre = F) 
+      RecibirMensaje(encontre, *)
+    Informar(0000) 
+  fin
+variables
+  r1,r2,r3: buscadores
+  jefe: escondedor
+comenzar
+  AsignarArea(r1, ciudad)
+  AsignarArea(r2, ciudad)
+  AsignarArea(r3, ciudad)  
+  AsignarArea(jefe, ciudad)
+  Iniciar(r1, 1,1)
+  Iniciar(r2, 2,2)
+  Iniciar(r3, 3,3)
+  Iniciar(jefe, 4,4)
+fin

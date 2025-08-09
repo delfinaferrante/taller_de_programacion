@@ -1,0 +1,75 @@
+programa ejemplo
+procesos
+  proceso recolectar(E av:numero; E ca:numero;E avIni:numero; E caIni:numero)
+  comenzar
+    BloquearEsquina(av,ca)
+    Pos(av,ca)
+    mientras(HayFlorEnLaEsquina)
+      tomarFlor
+    Pos(avIni,caIni)
+    LiberarEsquina(av,ca)
+  fin
+areas
+  ciudad: AreaC (1,1,100,100)
+robots
+  robot recolectores
+  variables
+    id,intentos,av,ca,avIni,caIni:numero
+  comenzar
+    RecibirMensaje(id, jefe)
+    Random(intentos,2,5)
+    Informar(intentos)
+    avIni:= PosAv
+    caIni:= PosCa
+    repetir intentos
+      EnviarMensaje(id, jefe)
+      RecibirMensaje(av,jefe)
+      RecibirMensaje(ca,jefe)
+      recolectar(av,ca,avIni,caIni)
+    EnviarMensaje(0, jefe)
+    EnviarMensaje(intentos, jefe)  
+  fin
+  robot fiscalizador
+  variables
+    av,ca,terminaron,id,intentos,total:numero
+  comenzar
+    EnviarMensaje(1, r1)
+    EnviarMensaje(2, r2)
+    EnviarMensaje(3, r3)
+    intentos:= 0
+    terminaron:= 0
+    total:= 0
+    mientras(terminaron <> 3)
+      RecibirMensaje(id, *)
+      Random(av,10,30)
+      Random(ca,10,30)
+      si(id = 1)
+        EnviarMensaje(av, r1)
+        EnviarMensaje(ca, r1)
+      sino
+        si(id = 2)
+          EnviarMensaje(av, r2)
+          EnviarMensaje(ca, r2)
+        sino
+          si(id = 3)
+            EnviarMensaje(av, r3)
+            EnviarMensaje(ca, r3)
+          sino
+            terminaron:= terminaron + 1
+            RecibirMensaje(intentos,*)
+            total:= total + intentos
+    Informar(total)
+  fin
+variables
+  r1,r2,r3: recolectores
+  jefe: fiscalizador
+comenzar
+  AsignarArea(r1, ciudad)
+  AsignarArea(r2, ciudad)
+  AsignarArea(r3, ciudad)
+  AsignarArea(jefe, ciudad)
+  Iniciar(r1, 1,1)
+  Iniciar(r2, 2,1)
+  Iniciar(r3, 3,1)
+  Iniciar(jefe, 9,9)
+fin

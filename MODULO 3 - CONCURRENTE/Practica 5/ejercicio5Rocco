@@ -1,0 +1,77 @@
+programa ejercicio5SinCorregir
+procesos
+  proceso enviarIds 
+  comenzar
+    EnviarMensaje(1,roboCliente1)
+    EnviarMensaje(2,roboCliente2)
+    EnviarMensaje(3,roboCliente3)
+  fin
+  proceso identificarYMandar(E id:numero; E tirada:numero)
+  comenzar
+    si (id = 1)
+      EnviarMensaje(tirada,roboCliente1)
+    sino
+      si (id = 2)
+        EnviarMensaje(tirada,roboCliente2)
+      sino
+        EnviarMensaje(tirada,roboCliente3)
+  fin
+areas
+  espera1: AreaP(10,1,10,1)
+  espera2: AreaP(11,1,11,1)
+  espera3: AreaP(12,1,12,1)
+  espera4: AreaP(13,1,13,1)
+  deposito: AreaC(100,1,100,1)
+robots
+  robot server
+  variables
+    id,tirada:numero
+  comenzar
+    enviarIds
+    repetir 12
+      RecibirMensaje(id,*)
+      Random(tirada,1,5)
+      BloquearEsquina(100,1)
+      Pos(100,1)
+      repetir tirada
+        depositarPapel
+      Pos(13,1)
+      LiberarEsquina(100,1)
+      identificarYMandar(id,tirada)
+  fin
+  robot cliente
+  variables
+    id,av,ca,papeles:numero
+  comenzar
+    RecibirMensaje(id,roboServer)
+    av:=PosAv
+    ca:=PosCa
+    repetir 4
+      EnviarMensaje(id,roboServer)
+      RecibirMensaje(papeles,roboServer)
+      BloquearEsquina(100,1)
+      Pos(100,1)
+      repetir papeles
+        tomarPapel
+      Pos(av,ca)
+      LiberarEsquina(100,1)
+      repetir papeles
+        depositarPapel
+  fin
+variables
+  roboServer: server
+  roboCliente1,roboCliente2,roboCliente3: cliente
+comenzar
+  AsignarArea(roboCliente1,deposito)
+  AsignarArea(roboCliente2,deposito)
+  AsignarArea(roboCliente3,deposito)
+  AsignarArea(roboServer,deposito)
+  AsignarArea(roboCliente1,espera1)
+  AsignarArea(roboCliente2,espera2)
+  AsignarArea(roboCliente3,espera3)
+  AsignarArea(roboServer,espera4)
+  Iniciar(roboCliente1,10,1)
+  Iniciar(roboCliente2,11,1)
+  Iniciar(roboCliente3,12,1)
+  Iniciar(roboServer,13,1)
+fin

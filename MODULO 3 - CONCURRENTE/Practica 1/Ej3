@@ -1,0 +1,85 @@
+programa Ej3
+procesos
+  proceso moverse(E cant:numero; ES flores:numero; ES papeles:numero)
+  comenzar
+    repetir cant
+      cantidadFlores(flores)
+      cantidadPapeles(papeles)
+      mover     
+  fin
+  proceso cantidadFlores(ES flores: numero)
+  variables
+    aux: numero
+  comenzar
+    aux:= 0
+    mientras HayFlorEnLaEsquina
+      tomarFlor
+      aux:= aux+1
+    flores:= flores+aux
+    repetir aux
+      depositarFlor
+  fin
+  proceso cantidadPapeles(ES papeles: numero)
+  variables
+    aux: numero
+  comenzar
+    aux:= 0
+    mientras HayPapelEnLaEsquina
+      tomarPapel
+      aux:= aux+1
+    papeles:= papeles+aux
+    repetir aux
+      depositarPapel   
+  fin
+  proceso compararFloresPapeles(ES cantEscalones: numero; E flores: numero; E papeles: numero)
+  comenzar
+    si (papeles - flores = 1)
+      cantEscalones:= cantEscalones+1
+  fin
+  proceso girar(E veces: numero)
+  comenzar
+    repetir veces
+      derecha
+  fin
+  proceso escalon(E cant:numero; ES cantEscalones: numero)
+  variables
+    flores, papeles: numero
+  comenzar
+    flores:= 0
+    papeles:= 0
+    repetir 2
+      moverse(cant, flores, papeles)
+      girar(1)
+    compararFloresPapeles(cantEscalones, flores, papeles)
+    flores:= 0
+    papeles:= 0
+    girar(2)
+  fin
+  proceso escalera
+  variables
+    cant, cantEscalones :numero
+  comenzar
+    cant:=1
+    cantEscalones:= 0
+    repetir 4
+      escalon(cant, cantEscalones)
+      cant:= cant*2
+    Informar(cantEscalones)
+  fin
+areas
+  ciudad:AreaC(1,1,100,100)
+robots
+  robot tipo1
+  comenzar
+    escalera
+  fin
+variables
+  robot1, robot2, robot3:tipo1
+comenzar
+  AsignarArea(robot1,ciudad)
+  AsignarArea(robot2,ciudad)
+  AsignarArea(robot3,ciudad)
+  Iniciar(robot1,12,14)
+  Iniciar(robot2,17,10)
+  Iniciar(robot3,22,6)
+fin

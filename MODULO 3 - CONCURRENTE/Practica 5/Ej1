@@ -1,0 +1,166 @@
+programa Ej1
+procesos
+  proceso juntarPapeles(ES papeles:numero)
+  comenzar
+    mientras(HayPapelEnLaEsquina)
+      tomarPapel
+      papeles:= papeles + 1
+  fin
+  proceso juntarFlores(ES flores:numero) 
+  comenzar
+    mientras(HayFlorEnLaEsquina)
+      tomarFlor
+      flores:= flores + 1
+  fin
+areas
+  {areaR1: AreaP (2,1,2,97)}
+  {areaR2: AreaP (3,1,3,97)}
+  
+  {areaA1: AreaP (4,99,100,99)}
+  {areaA2: AreaP (4,98,100,98)}
+
+  {areaComun: AreaC (1,1,100,100)}
+  areaJefe: AreaP (1,1,1,1)
+  areaEquipoRojo: AreaPC (2,1,3,100)
+  areaEquipoAzul: AreaPC (1,98,100,99)
+  {areaCruces: AreaPC (1,98,3,100)}
+robots
+  robot equipoRojo
+  variables
+    calleCruce,flores, numEquipo,id:numero
+    termino:boolean
+  comenzar
+    termino:= F
+    flores:= 0
+    calleCruce:= 98
+    RecibirMensaje(numEquipo, robotJefe)
+    RecibirMensaje(id, robotJefe)
+    
+    mientras(PosCa < calleCruce)
+      si(HayFlorEnLaEsquina)
+        juntarFlores(flores)
+      mover
+        
+    mientras(PosCa < 100)& ~(termino)
+      BloquearEsquina(PosAv,calleCruce) 
+      Pos(PosAv,calleCruce)
+      si(HayFlorEnLaEsquina)
+        juntarFlores(flores)
+      si(PosCa < 100)
+        mover
+      sino
+        termino:= V
+      LiberarEsquina(PosAv,calleCruce)
+      calleCruce:= PosCa
+      
+    EnviarMensaje(id, robotJefe)
+    EnviarMensaje(flores,robotJefe)
+  fin
+  
+  robot equipoAzul
+  variables
+    avCruce,papeles,numEquipo,id:numero
+  comenzar
+    papeles:= 0
+    avCruce:= 2
+    RecibirMensaje(numEquipo, robotJefe)
+    RecibirMensaje(id, robotJefe)
+    derecha
+    mientras(PosAv <= 3)
+      si(PosAv = 1)  
+        si(HayPapelEnLaEsquina)
+          juntarPapeles(papeles)
+         
+      BloquearEsquina(avCruce, PosCa)
+      Pos(avCruce,PosCa)
+      si(HayPapelEnLaEsquina)
+        juntarPapeles(papeles)
+      BloquearEsquina(avCruce+1, PosCa)
+      Pos(avCruce+1, PosCa)
+      LiberarEsquina(avCruce, PosCa)
+      Pos(avCruce+2, PosCa)
+      LiberarEsquina(avCruce+1, PosCa)   
+       
+    {sale cuando av es 4}
+    mientras(PosAv >= 4) & (PosAv < 100)
+      si(HayPapelEnLaEsquina)
+        juntarPapeles(papeles)
+      mover
+      
+    EnviarMensaje(id, robotJefe)
+    EnviarMensaje(papeles,robotJefe)
+  fin
+    
+  robot jefe
+  variables
+    equipo,flores, totalFlores,papeles, totalPapeles, equipoGanador,id:numero
+  comenzar
+    totalFlores:= 0
+    totalPapeles:= 0
+    EnviarMensaje(1, r1) {equipo rojo / FLORES}
+    EnviarMensaje(1, r2)    
+    EnviarMensaje(2, a1) {equipo azul / PAPELES}
+    EnviarMensaje(2, a2)
+    
+    EnviarMensaje(1,r1)
+    EnviarMensaje(2,r2)
+    EnviarMensaje(3,a1)
+    EnviarMensaje(4,a2)
+    
+    repetir 4
+      RecibirMensaje(id, *)
+      si(id = 1)
+        RecibirMensaje(flores, r1)
+        totalFlores:= totalFlores + flores
+      sino
+        si(id = 2)
+          RecibirMensaje(flores, r2)
+          totalFlores:= totalFlores + flores
+        sino
+          si(id = 3)
+            RecibirMensaje(papeles, a1)
+            totalPapeles:= totalPapeles + papeles 
+          sino
+            RecibirMensaje(papeles, a2)
+            totalPapeles:= totalPapeles + papeles
+     
+    si(totalFlores > totalPapeles)
+      equipoGanador:= 1
+    sino
+      equipoGanador:= 2
+        
+    Informar(equipoGanador)
+  fin
+variables
+  r1, r2: equipoRojo
+  a1, a2: equipoAzul
+  robotJefe: jefe
+comenzar
+  {AsignarArea(r1, areaR1)}
+  {AsignarArea(r2, areaR2)}
+  
+  {AsignarArea(a1, areaA1)}
+  {AsignarArea(a2, areaA2)}
+  
+  AsignarArea(robotJefe, areaJefe)
+  AsignarArea (a1, areaEquipoAzul)
+  AsignarArea (a2, areaEquipoAzul)
+  AsignarArea (r1, areaEquipoRojo)
+  AsignarArea (r2, areaEquipoRojo)
+  
+  {AsignarArea(a1, areaCruces)}
+  {AsignarArea(a2, areaCruces)}
+  {AsignarArea(r1, areaCruces)}
+ { AsignarArea(r2, areaCruces)}
+  
+  {AsignarArea(a1, areaComun) } 
+  {AsignarArea(a2, areaComun)}
+  {AsignarArea(r1, areaComun)}
+  {AsignarArea(r2, areaComun)}
+  {AsignarArea(robotJefe, areaComun)}
+  Iniciar(r1, 2,1)
+  Iniciar(r2, 3,1)
+  Iniciar(a1, 1,98)
+  Iniciar(a2, 1,99)
+  Iniciar(robotJefe,1,1)
+fin

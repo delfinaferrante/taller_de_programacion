@@ -1,0 +1,107 @@
+programa Ej4
+procesos
+  proceso vaciarBolsa(E flores:numero; E papeles:numero)
+  comenzar
+    mientras(HayFlorEnLaBolsa)&(flores > 0)
+      depositarFlor
+      flores:= flores - 1
+    mientras(HayPapelEnLaBolsa)&(papeles > 0)
+      depositarPapel
+      papeles:= papeles - 1
+  fin
+  proceso juntarPapeles(ES papeles:numero)
+  comenzar
+    mientras(HayPapelEnLaEsquina)
+      tomarPapel
+      papeles:= papeles + 1
+  fin
+  proceso juntarFlores(ES flores:numero)
+  comenzar
+    mientras(HayFlorEnLaEsquina)
+      tomarFlor
+      flores:= flores + 1
+  fin
+  proceso realizarTarea(E tarea:numero; ES flores:numero; ES papeles:numero)
+  comenzar
+    {Informar(tarea)}
+    si(tarea = 1)
+      juntarFlores(flores)
+    sino
+      si(tarea = 2)
+        juntarPapeles(papeles)
+      sino
+        vaciarBolsa(flores,papeles)
+  fin
+areas
+  area1: AreaP (2,1,2,1)
+  area2: AreaP (3,1,3,1)
+  area3: AreaP (1,1,1,1)
+  areaAleatoria: AreaPC (2, 2, 50, 50)
+robots
+  robot trabajadores
+  variables
+    av,calle,tarea,flores,papeles,id:numero
+    ok:boolean
+  comenzar
+    RecibirMensaje(id, r3)
+    EnviarMensaje(id, r3)  
+    RecibirMensaje(tarea, r3)
+    
+    mientras(tarea <> 4)
+      RecibirMensaje(av, r3)
+      RecibirMensaje(calle, r3) 
+      BloquearEsquina(av, calle)
+      Pos(av, calle)
+      realizarTarea(tarea,flores,papeles)
+      ok:= V
+      EnviarMensaje(ok, r3)
+      LiberarEsquina(av, calle) 
+      EnviarMensaje(id, r3)      
+      RecibirMensaje(tarea,r3)
+    ok:= F
+    Informar(ok)
+  fin
+  robot jefe
+  variables
+    avRandom, calleRandom, tarea, cantTareas,id:numero
+    ok:boolean
+  comenzar
+    cantTareas:= 0
+    EnviarMensaje(1,r1)
+    EnviarMensaje(2,r2)
+    mientras(cantTareas < 10)
+      Random(avRandom, 2, 50)
+      Random(calleRandom, 2, 50)
+      Random(tarea,1,3)
+      RecibirMensaje(id, *)
+      si(id = 1)
+        EnviarMensaje(tarea,r1)
+        EnviarMensaje(avRandom, r1)
+        EnviarMensaje(calleRandom, r1)
+        RecibirMensaje(ok,r1)
+        cantTareas:= cantTareas + 1
+      sino
+        EnviarMensaje(tarea,r2)
+        EnviarMensaje(avRandom, r2)
+        EnviarMensaje(calleRandom, r2) 
+        RecibirMensaje(ok, r2)   
+        cantTareas:= cantTareas + 1
+          
+    {cuando ya se mandaron todas las tareas}
+    tarea:= 4
+    EnviarMensaje(tarea,r1)
+    EnviarMensaje(tarea,r2)
+  fin
+variables
+  r1,r2: trabajadores
+  r3: jefe
+comenzar
+  AsignarArea(r3, area3)
+  AsignarArea(r1, area1)
+  AsignarArea(r2, area2)
+  AsignarArea(r1, areaAleatoria)
+  AsignarArea(r2, areaAleatoria)
+  Iniciar(r1, 2,1)
+  Iniciar(r2, 3, 1)
+  Iniciar(r3, 1, 1)
+fin

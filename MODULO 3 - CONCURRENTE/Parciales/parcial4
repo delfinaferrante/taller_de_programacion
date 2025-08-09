@@ -1,0 +1,145 @@
+programa parcial4
+procesos
+  proceso enviarMensajes
+  comenzar
+    EnviarMensaje(1, r1equipo1)
+    EnviarMensaje(1, r3equipo1)
+    EnviarMensaje(2, r2equipo2)
+    EnviarMensaje(2, r4equipo2)   
+    
+    EnviarMensaje(1, r1equipo1)
+    EnviarMensaje(2, r3equipo1)
+    EnviarMensaje(3, r2equipo2)
+    EnviarMensaje(4, r4equipo2)
+  fin
+  proceso depositarUnaFlor(ES flores:numero)
+  comenzar
+    si(flores > 0)
+      depositarFlor
+      flores:= flores - 1
+  fin
+  proceso depositarFlores(E flores:numero; E av:numero; E calle:numero)
+  comenzar
+    BloquearEsquina(20,20)
+    Pos(20,20)
+    mientras(flores > 0)
+      depositarUnaFlor(flores)
+    Pos(av,calle)
+    LiberarEsquina(20,20)
+  fin
+  proceso juntarFlores(ES flores:numero)
+  comenzar
+    mientras(HayFlorEnLaEsquina)
+      tomarFlor
+      flores:= flores + 1
+  fin
+  proceso recorrido(E cant:numero;ES flores:numero)
+  comenzar
+    repetir cant
+      mover
+      si(HayFlorEnLaEsquina)
+        juntarFlores(flores)
+  fin
+areas
+  areaEquipo1: AreaPC (1,1,11,11)
+  areaEquipo2: AreaPC (13,1,23,11)
+  areaJefe: AreaP (30,1,30,1)
+  areaDeposito: AreaPC (20,20,20,20)
+robots
+  robot primerEtapa
+  variables
+    flores,equipo,av,calle,id:numero
+  comenzar
+    flores:= 0
+    RecibirMensaje(equipo, rjefe)
+    RecibirMensaje(id, rjefe)
+    recorrido(10,flores)
+    derecha
+    recorrido(10,flores)
+    si(equipo = 1)
+      EnviarMensaje(V, r3equipo1) {si soy el robot del equipo1, aviso a mi compañero q termine}
+    sino
+      EnviarMensaje(V, r4equipo2)
+    av:= PosAv
+    calle:= PosCa  
+    depositarFlores(flores,av,calle)
+    EnviarMensaje(id, rjefe)
+    EnviarMensaje(flores, rjefe)  {cuando termina le envio las flores q junte}
+  fin
+  
+  robot segundaEtapa
+  variables
+    flores,equipo,av,calle,id:numero
+    puedoEmpezar:boolean
+  comenzar
+    flores:= 0
+    RecibirMensaje(equipo, rjefe)
+    RecibirMensaje(id, rjefe)    
+    si(equipo = 1)
+      RecibirMensaje(puedoEmpezar, r1equipo1)
+    sino
+      RecibirMensaje(puedoEmpezar, r2equipo2)
+    repetir 2
+      derecha
+    recorrido(9,flores)
+    derecha
+    recorrido(9,flores)
+    av:= PosAv
+    calle:= PosCa
+    depositarFlores(flores,av,calle)
+    EnviarMensaje(id, rjefe)
+    EnviarMensaje(flores, rjefe)
+  fin 
+  
+  robot fiscalizador
+  variables
+    id, f1, f2, maxFlores, equipoGanador,aux:numero
+  comenzar
+    f1:= 0
+    f2:= 0
+    maxFlores:= -1
+    enviarMensajes
+    repetir 4
+      RecibirMensaje(id,*)
+      si(id = 1)
+        RecibirMensaje(aux, r1equipo1)
+        f1:= f1 + aux
+      sino
+        si(id = 2)
+          RecibirMensaje(aux, r3equipo1)
+          f1:= f1 + aux
+        sino
+          si(id = 3)
+            RecibirMensaje(aux, r2equipo2)
+            f2:= f2 + aux
+          sino
+            RecibirMensaje(aux, r4equipo2)
+            f2:= f2 + aux
+    si(f1 > f2)
+      maxFlores:= f1
+      equipoGanador:= 1
+    sino
+      maxFlores:= f2
+      equipoGanador:= 2
+    Informar(equipoGanador)
+  fin
+variables
+  r1equipo1,r2equipo2: primerEtapa
+  r3equipo1,r4equipo2: segundaEtapa
+  rjefe: fiscalizador
+comenzar
+  AsignarArea(r1equipo1, areaEquipo1)
+  AsignarArea(r3equipo1, areaEquipo1)
+  AsignarArea(r2equipo2, areaEquipo2)
+  AsignarArea(r4equipo2, areaEquipo2)  
+  AsignarArea(r1equipo1, areaDeposito)
+  AsignarArea(r3equipo1, areaDeposito)
+  AsignarArea(r2equipo2, areaDeposito)
+  AsignarArea(r4equipo2, areaDeposito)  
+  AsignarArea(rjefe, areaJefe)
+  Iniciar(r1equipo1, 1,1)
+  Iniciar(r3equipo1, 11, 10)
+  Iniciar(r2equipo2, 13,1)
+  Iniciar(r4equipo2, 23,10)
+  Iniciar(rjefe, 30,1)
+fin

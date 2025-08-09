@@ -1,0 +1,63 @@
+programa Ej2
+procesos
+  proceso girar(E cantVeces:numero)
+  comenzar
+    repetir cantVeces
+      derecha
+  fin
+  proceso juntarPapeles(ES papeles:numero)
+  comenzar
+    mientras(HayPapelEnLaEsquina)
+      tomarPapel
+      papeles:= papeles+1
+  fin
+  proceso recorrer
+  variables
+    cantPapeles:numero
+  comenzar
+    cantPapeles:=0
+    repetir 20
+      si(HayPapelEnLaEsquina)
+        juntarPapeles(cantPapeles)
+      mover  
+    si(HayPapelEnLaEsquina)
+      juntarPapeles(cantPapeles)
+    Informar(cantPapeles)
+  fin
+areas
+  perimetro: AreaPC (10,10,30,30)
+robots
+  robot tipo1
+  comenzar
+    recorrer
+  fin
+  robot tipo2
+  comenzar
+    girar(1)
+    recorrer
+  fin
+  robot tipo3
+  comenzar
+    girar(2)
+    recorrer
+  fin
+  robot tipo4
+  comenzar
+    girar(3)
+    recorrer
+  fin
+variables
+  robot1: tipo1
+  robot2: tipo2
+  robot3: tipo3
+  robot4: tipo4
+comenzar
+  AsignarArea(robot1, perimetro)
+  AsignarArea(robot2, perimetro)
+  AsignarArea(robot3, perimetro)
+  AsignarArea(robot4, perimetro)
+  Iniciar(robot1, 10,10)
+  Iniciar(robot2, 10,30)
+  Iniciar(robot3, 30,30)
+  Iniciar(robot4, 30,10)
+fin

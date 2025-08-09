@@ -1,0 +1,102 @@
+programa Ej2
+procesos
+  proceso dejarPapeles(ES papeles:numero)
+  comenzar
+    mientras(papeles > 0)
+      depositarPapel
+      papeles:= papeles - 1
+  fin
+  proceso depositarPapeles(ES papeles:numero; E av:numero; E calle:numero)
+  comenzar 
+    BloquearEsquina(50,50)
+    Pos(50,50)
+    dejarPapeles(papeles)
+    Pos(av,calle)
+    LiberarEsquina(50,50)
+  fin
+  proceso chequearEsquina(ES papeles:numero; ES intentosFallidos:numero)
+  variables
+    cantQueAgarro:numero
+  comenzar
+    cantQueAgarro:= 0
+    mientras(papeles <> 0)&(intentosFallidos <> 8)
+      si(HayPapelEnLaEsquina)
+        tomarPapel
+        cantQueAgarro:= cantQueAgarro + 1
+        intentosFallidos:= 0
+        papeles:= papeles - 1
+      sino
+        dejarPapeles(cantQueAgarro)
+        intentosFallidos:= intentosFallidos + 1   
+  fin
+  proceso juntarPapeles(ES papeles:numero)
+  comenzar
+    si(HayPapelEnLaEsquina)
+      tomarPapel
+      papeles:= papeles + 1
+  fin
+areas
+  areaProd1: AreaP (5,1,5,100)
+  areaProd2: AreaP (10,1,10,100)
+  areaCons1: AreaP (11,1,11,1)
+  areaCons2: AreaP (12,1,12,1)
+  areaDeposito: AreaC(49,49,51,51)
+robots
+  robot productores
+  variables
+    cantPapeles,movimientos,calle,av:numero
+    ok:boolean
+  comenzar
+    cantPapeles:= 0
+    movimientos:= 0
+    mientras(movimientos < 99)
+      si(cantPapeles < 5)
+        juntarPapeles(cantPapeles)
+        mover
+        movimientos:= movimientos + 1
+      sino
+        calle:= PosCa
+        av:= PosAv 
+        depositarPapeles(cantPapeles,av,calle)
+        cantPapeles:= 0
+        ok:= V
+        EnviarMensaje(ok,cons1)
+        EnviarMensaje(ok,cons2)
+  fin
+  robot consumidores
+  variables
+    cantPapeles,avInicio,calleInicio,intentosFallidos:numero
+    ok:boolean
+  comenzar
+    intentosFallidos:= 0
+    avInicio:= PosAv
+    calleInicio:= PosCa
+    RecibirMensaje(ok,*)
+    mientras(intentosFallidos <> 8)
+      Random(cantPapeles, 2, 5)
+      BloquearEsquina(50,50)
+      Pos(50,50)
+      chequearEsquina(cantPapeles, intentosFallidos)
+      Pos(avInicio,calleInicio)
+      LiberarEsquina(50,50)
+      si(cantPapeles <> 0)
+        dejarPapeles(cantPapeles)
+    Informar("consumidor",intentosFallidos)
+  fin
+variables
+  prod1,prod2: productores
+  cons1,cons2: consumidores
+comenzar
+  AsignarArea(prod1, areaProd1)
+  AsignarArea(prod2, areaProd2)
+  AsignarArea(cons1, areaCons1)
+  AsignarArea(cons2, areaCons2)
+  AsignarArea(prod1, areaDeposito)
+  AsignarArea(prod2, areaDeposito)
+  AsignarArea(cons1, areaDeposito)
+  AsignarArea(cons2, areaDeposito)
+  Iniciar(prod1, 5,1)
+  Iniciar(prod2, 10,1)
+  Iniciar(cons1, 11,1)
+  Iniciar(cons2, 12,1)
+fin

@@ -1,0 +1,68 @@
+programa Ej3A
+procesos
+  proceso juntarPapeles
+  comenzar
+    mientras(HayPapelEnLaEsquina)
+      tomarPapel
+  fin
+  proceso unaEtapa(ES movimientos:numero)
+  comenzar
+    repetir 5
+      juntarPapeles
+      mover
+      movimientos:= movimientos + 1
+  fin
+areas
+  area1: AreaP (1,1,1,100)
+  area2: AreaP (2,1,2,100)
+  area3: AreaP (3,1,3,100)
+  areaJefe: AreaP (4,1,4,1)
+robots
+  robot recolectores
+  variables
+    id, esquinas, aux:numero
+  comenzar
+    RecibirMensaje(id, rjefe)
+    mientras(PosCa < 100)
+      esquinas:= 0
+      mientras(esquinas <> 5)&(PosCa < 100)
+        juntarPapeles
+        mover
+        esquinas:= esquinas + 1
+        
+      si(id = 1)
+        EnviarMensaje(1, r2)
+        EnviarMensaje(1, r3)
+        RecibirMensaje(aux, r2)
+        RecibirMensaje(aux, r3)
+      sino
+        si(id = 2)
+          EnviarMensaje(2, r1)
+          EnviarMensaje(2, r3)
+          RecibirMensaje(aux, r1)
+          RecibirMensaje(aux, r3)
+        sino
+          EnviarMensaje(3,r1)
+          EnviarMensaje(3,r2)
+          RecibirMensaje(aux,r1)
+          RecibirMensaje(aux,r2)
+  fin
+  robot jefe
+  comenzar
+    EnviarMensaje(1,r1)
+    EnviarMensaje(2,r2)
+    EnviarMensaje(3,r3)
+  fin
+variables
+  r1,r2,r3: recolectores
+  rjefe: jefe
+comenzar
+  AsignarArea(r1, area1)
+  AsignarArea(r2, area2)
+  AsignarArea(r3, area3)
+  AsignarArea(rjefe, areaJefe)  
+  Iniciar(r1, 1,1)
+  Iniciar(r2, 2,1)
+  Iniciar(r3, 3,1)
+  Iniciar(rjefe, 4,1)
+fin

@@ -1,0 +1,117 @@
+programa parcial1
+procesos
+  proceso recibirMensajes(ES ganador:numero)
+  variables
+    id,cant1,cant2:numero
+  comenzar
+    cant1:= 0
+    cant2:= 0
+    repetir 2
+      RecibirMensaje(id, *)
+      si(id = 1)
+        RecibirMensaje(cant1, r1)
+      sino
+        RecibirMensaje(cant2, r2)
+    si(cant1 > cant2)
+      ganador:= 1
+    sino
+      ganador:= 2
+  fin
+  proceso juntarUnPapel(ES papeles:numero)
+  comenzar
+    si(HayPapelEnLaEsquina)
+      tomarPapel
+      papeles:= papeles + 1
+  fin
+  proceso juntarUnaFlor(ES flores:numero)
+  comenzar
+    si(HayFlorEnLaEsquina)
+      tomarFlor
+      flores:= flores + 1
+  fin
+  proceso esquinaComun(ES loQueJunta:numero; E ida:boolean)
+  comenzar
+    BloquearEsquina(6,6)
+    Pos(6,6)
+    si(ida = V)
+      juntarUnaFlor(loQueJunta)
+    sino
+      juntarUnPapel(loQueJunta)
+  fin
+  proceso recorrido(ES loQueJunta:numero; E ida:boolean)
+  comenzar
+    repetir 4
+      si(ida = V)
+        juntarUnaFlor(loQueJunta)
+      sino
+        juntarUnPapel(loQueJunta)
+      mover
+  fin
+areas
+  primerAreaR1: AreaP (1,5,5,5)
+  segundaAreaR1: AreaP (7,7,11,7)
+  primerAreaR2: AreaP (1,7,5,7)
+  segundaAreaR2: AreaP (7,5,11,5)
+  areaJefe: AreaP (1,6,1,6)
+  areaComun: AreaPC (6,6,6,6)
+robots
+  robot corredores
+  variables
+    flores,id,papeles:numero
+    ida:boolean
+  comenzar
+    RecibirMensaje(id, jefe)
+    flores:= 0
+    papeles:= 0
+    ida:= V
+    derecha
+    recorrido(flores,ida)
+    esquinaComun(flores,ida)
+    si(id = 1)
+      Pos(7,7)
+    sino
+      Pos(7,5)
+    LiberarEsquina(6,6)
+    recorrido(flores,ida)
+    EnviarMensaje(id, jefe)  
+    EnviarMensaje(flores, jefe) {--- TERMINA LA IDA ----}
+    repetir 2
+      derecha
+    ida:= F
+    recorrido(papeles, ida)
+    esquinaComun(papeles,ida)
+    si(id = 1)
+      Pos(5,5)
+    sino
+      Pos(5,7)
+    LiberarEsquina(6,6) 
+    recorrido(papeles, ida)
+    EnviarMensaje(id, jefe)
+    EnviarMensaje(papeles, jefe)   {--- TERMINA LA VUELTA ----} 
+  fin
+  robot fiscalizador
+  variables
+    ganador:numero
+  comenzar
+    EnviarMensaje(1, r1)
+    EnviarMensaje(2, r2)
+    recibirMensajes(ganador)
+    Informar(ganador)
+    recibirMensajes(ganador)
+    Informar(ganador)
+  fin
+variables
+  r1,r2: corredores
+  jefe: fiscalizador
+comenzar
+  AsignarArea(r1, primerAreaR1)
+  AsignarArea(r1, segundaAreaR1)
+  AsignarArea(r1, areaComun)
+  AsignarArea(r2, primerAreaR2)
+  AsignarArea(r2, segundaAreaR2)
+  AsignarArea(r2, areaComun)
+  AsignarArea(jefe, areaJefe)
+  Iniciar(r1, 1,5)
+  Iniciar(r2, 1,7)
+  Iniciar(jefe, 1,6)
+fin

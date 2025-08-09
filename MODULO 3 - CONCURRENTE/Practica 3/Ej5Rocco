@@ -1,0 +1,95 @@
+programa Ej5
+procesos
+  proceso enviarIds
+  comenzar
+    EnviarMensaje(1,papelero1)
+    EnviarMensaje(2,papelero2)
+    EnviarMensaje(3,papelero3)
+    EnviarMensaje(4,papelero4)
+  fin
+  proceso identificarId(E id:numero; ES calle:numero)
+  comenzar
+    si(id=1)
+      RecibirMensaje(calle,papelero1)
+    sino
+      si(id=2)
+        RecibirMensaje(calle,papelero2)
+      sino
+        si(id=3)
+          RecibirMensaje(calle,papelero3)
+        sino
+          RecibirMensaje(calle,papelero4)
+  fin
+areas
+  ave1: AreaP (4,1,4,100)
+  ave2: AreaP (6,1,6,100)
+  ave3: AreaP (8,1,8,100)
+  ave4: AreaP (10,1,10,100)
+  fuente: AreaPC (11,11,11,11)
+  inicioCoord: AreaP(1,1,1,1)
+robots
+  robot tipoPapelero
+  variables
+    avAct,caAct,id,movimientos:numero
+    seguir:boolean
+  comenzar
+    RecibirMensaje(id,coordinador)
+    seguir:= V
+    movimientos:= 0
+    avAct:= PosAv
+    caAct:= PosCa 
+    mientras (seguir)&(movimientos<99)
+      BloquearEsquina(11,11)
+      Pos(11,11)
+      si (HayPapelEnLaEsquina)
+        tomarPapel
+        seguir:=V
+      sino
+        seguir:=F
+      Pos(avAct,caAct)
+      LiberarEsquina(11,11)
+      si (seguir)
+        depositarPapel
+        mover
+        movimientos:= movimientos+1
+        caAct:=PosCa
+      sino
+        EnviarMensaje(id,coordinador)
+        EnviarMensaje(PosCa,coordinador)
+  fin
+  robot tipoCoordinador
+  variables 
+    id,cant,idMax,cantMax:numero
+  comenzar
+    enviarIds
+    cantMax:=-1
+    repetir 4
+      RecibirMensaje(id,*)
+      identificarId(id,cant)
+      si(cant>cantMax)
+        cantMax:=cant
+        idMax:=id
+    Informar(idMax)
+  fin
+variables
+  papelero1:tipoPapelero
+  papelero2:tipoPapelero
+  papelero3:tipoPapelero
+  papelero4:tipoPapelero
+  coordinador: tipoCoordinador
+comenzar
+  AsignarArea(papelero1,ave1)
+  AsignarArea(papelero2,ave2)
+  AsignarArea(papelero3,ave3)
+  AsignarArea(papelero4,ave4)
+  AsignarArea(papelero1,fuente)
+  AsignarArea(papelero2,fuente)
+  AsignarArea(papelero3,fuente)
+  AsignarArea(papelero4,fuente)
+  AsignarArea(coordinador,inicioCoord)
+  Iniciar(papelero1,4,1)
+  Iniciar(papelero2,6,1)
+  Iniciar(papelero3,8,1)
+  Iniciar(papelero4,10,1)
+  Iniciar(coordinador,1,1)
+fin

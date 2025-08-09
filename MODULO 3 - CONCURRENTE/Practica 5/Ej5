@@ -1,0 +1,95 @@
+programa Ej5
+procesos
+  proceso depositarlos(E papeles:numero) 
+  comenzar
+    mientras(papeles > 0)
+      depositarPapel
+      papeles:= papeles-1
+  fin
+  proceso irARecolectar(E papeles:numero)
+  variables
+    calleInicial, avInicial:numero
+  comenzar
+    avInicial:= PosAv
+    calleInicial:= PosCa
+    BloquearEsquina(100,1)
+    Pos(100,1)
+    repetir papeles
+      si(HayPapelEnLaEsquina)
+        tomarPapel
+    Pos(avInicial,calleInicial)
+    LiberarEsquina(100,1)
+    depositarlos(papeles)
+  fin
+areas
+  ciudad: AreaC (1,1,100,20)
+robots
+  robot clientes
+  variables
+    id,intentos,cantPapeles:numero
+  comenzar
+    intentos:= 0
+    RecibirMensaje(id, rservidor)
+    mientras(intentos < 4)
+      EnviarMensaje(id, rservidor)          {manda pedido}
+      RecibirMensaje(cantPapeles,rservidor) {recibe cant papeles q tiene q juntar}
+      irARecolectar(cantPapeles)
+      EnviarMensaje(F,rservidor)
+      intentos:= intentos + 1
+    Informar("c", intentos)
+    EnviarMensaje(V, rservidor)
+  fin
+  robot servidor
+  variables
+    ok:boolean
+    id,cantPapeles,avInicio,calleInicio,intentos:numero
+  comenzar
+    intentos:= 0
+    avInicio:= PosAv
+    calleInicio:= PosCa
+    mientras(HayPapelEnLaEsquina)
+      tomarPapel
+    EnviarMensaje(1,cliente1)
+    EnviarMensaje(2,cliente2)
+    EnviarMensaje(3,cliente3)
+    
+    mientras (intentos < 12) {4 intentos x robot = 12 intentos en total}
+      Random(cantPapeles,1,5)
+      RecibirMensaje(id, *) {recibe un pedido}
+      BloquearEsquina(100,1)
+      Pos(100,1)
+      depositarlos(cantPapeles)
+      Pos(avInicio,calleInicio)
+      LiberarEsquina(100,1)
+      si(id = 1)
+        EnviarMensaje(cantPapeles,cliente1)
+        RecibirMensaje(ok, cliente1) 
+        si ~(ok) {si es F, entonces faltan intentos,entonces los sumo hasta llegar a 4}
+          intentos:= intentos + 1
+      sino
+        si(id = 2)
+          EnviarMensaje(cantPapeles, cliente2)
+          RecibirMensaje(ok, cliente2)
+          si ~(ok)
+            intentos:= intentos + 1
+        sino
+          EnviarMensaje(cantPapeles,cliente3) 
+          RecibirMensaje(ok, cliente3)
+          si ~(ok)
+            intentos:= intentos + 1
+      Informar(intentos)
+    Informar(V)  
+  fin
+variables
+  cliente1,cliente2,cliente3: clientes
+  rservidor:servidor
+comenzar
+  AsignarArea(cliente1, ciudad)
+  AsignarArea(cliente2, ciudad)
+  AsignarArea(cliente3, ciudad)
+  AsignarArea(rservidor, ciudad)
+  Iniciar(cliente1, 10,1)
+  Iniciar(cliente2, 11,1)
+  Iniciar(cliente3, 12,1)
+  Iniciar(rservidor, 13,1)
+fin

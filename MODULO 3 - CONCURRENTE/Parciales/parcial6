@@ -1,0 +1,148 @@
+programa parcial6
+procesos
+  proceso irABuscarObjetos(ES cant:numero; E avInicio:numero; E calleInicio:numero)
+  variables
+    papeles,flores:numero
+  comenzar
+    papeles:= 0
+    flores:= 0
+    BloquearEsquina(50,50)
+    Pos(50,50)
+    mientras(HayPapelEnLaEsquina)
+      tomarPapel
+      papeles:= papeles + 1
+    BloquearEsquina(49,49)
+    Pos(49,49)
+    LiberarEsquina(50,50)
+    mientras(HayFlorEnLaEsquina)
+      tomarFlor
+      flores:= flores + 1
+    cant:= flores + papeles
+    Pos(avInicio,calleInicio)
+    LiberarEsquina(49,49)
+  fin
+  proceso depositarLasFlores(ES flores:numero; E av:numero; E calle:numero)
+  comenzar
+    BloquearEsquina(49,49)
+    Pos(49,49)
+    mientras(flores > 0)
+      depositarFlor
+      flores:= flores - 1
+    Pos(av,calle)
+    LiberarEsquina(49,49)
+  fin
+  proceso depositarLosPapeles(ES papeles:numero;E av:numero; E calle:numero)
+  comenzar
+    BloquearEsquina(50,50)
+    Pos(50,50)
+    mientras(papeles > 0)
+      depositarPapel
+      papeles:= papeles - 1
+    Pos(av,calle)
+    LiberarEsquina(50,50)
+  fin
+  proceso juntarPapeles(ES papeles:numero)
+  comenzar
+    mientras(HayPapelEnLaEsquina)
+      tomarPapel
+      papeles:= papeles + 1
+  fin
+  proceso juntarFlores(ES flores:numero)
+  comenzar
+    mientras(HayFlorEnLaEsquina)
+      tomarFlor
+      flores:= flores + 1
+  fin
+  proceso moverse(E pasos:numero;ES loQueJunta:numero; E juntaPapeles:boolean)
+  comenzar
+    repetir pasos
+      si(juntaPapeles)
+        si(HayPapelEnLaEsquina)
+          juntarPapeles(loQueJunta)
+      sino
+        si(HayFlorEnLaEsquina)
+          juntarFlores(loQueJunta)
+      mover
+  fin
+areas
+  ciudad: AreaC (1,1,100,100)
+robots
+  robot papelerosD
+  variables
+    pasos,papeles:numero
+    av,calle,equipo:numero
+    juntaPapeles:boolean
+  comenzar
+    RecibirMensaje(equipo, jefe)
+    juntaPapeles:= V
+    Random(pasos, 4, 8)
+    moverse(pasos,papeles,juntaPapeles)
+    derecha
+    repetir 2
+      moverse(pasos,papeles,juntaPapeles)
+    av:= PosAv
+    calle:= PosCa
+    depositarLosPapeles(papeles,av,calle)
+    EnviarMensaje(equipo,jefe)
+  fin
+  robot florerosI
+  variables
+    pasos,flores,av,calle,equipo:numero
+    juntaPapeles:boolean
+  comenzar
+    RecibirMensaje(equipo, jefe)
+    juntaPapeles:= F
+    Random(pasos,3,7)
+    moverse(pasos,flores,juntaPapeles)
+    repetir 3
+      derecha
+    repetir 2
+      moverse(pasos,flores,juntaPapeles)
+    av:= PosAv
+    calle:= PosCa
+    depositarLasFlores(flores,av,calle)
+    EnviarMensaje(equipo, jefe)
+  fin
+  robot fiscalizador
+  variables
+    equipo,llego1,llego2,primerEquipo,cantTotal,avInicio,calleInicio:numero
+    llegoUnEquipo: boolean
+  comenzar
+    cantTotal:= 0
+    avInicio:= PosAv
+    calleInicio:= PosCa
+    EnviarMensaje(1, p1)
+    EnviarMensaje(1, p2)
+    EnviarMensaje(2, f1)
+    EnviarMensaje(2, f2)
+    
+    llegoUnEquipo:= F
+    mientras ~(llegoUnEquipo)
+      RecibirMensaje(equipo,*)
+      si(equipo = 1)
+        llego1:= llego1 + 1
+      sino
+        llego2:= llego2 + 1
+      si(llego1 = 2)|(llego2 = 2)
+        llegoUnEquipo:= V
+        primerEquipo:= equipo
+        Informar(primerEquipo)
+    irABuscarObjetos(cantTotal,avInicio,calleInicio)
+    Informar(cantTotal)
+  fin
+variables
+  p1,p2: papelerosD
+  f1,f2: florerosI
+  jefe: fiscalizador
+comenzar
+  AsignarArea(p1, ciudad)
+  AsignarArea(p2, ciudad)
+  AsignarArea(f1, ciudad)
+  AsignarArea(f2, ciudad)
+  AsignarArea(jefe, ciudad)
+  Iniciar(p1, 50,1)
+  Iniciar(p2, 50, 20)
+  Iniciar(f1, 49,1)
+  Iniciar(f2, 49,20)
+  Iniciar(jefe, 1,1)
+fin

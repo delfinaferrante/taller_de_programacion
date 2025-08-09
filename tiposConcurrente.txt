@@ -1,0 +1,26 @@
+CLIENTES Y SERVIDORES
+- se manda id de cada uno y cuando se recibe id = 0 es porque termino de hacer algo.
+- muchos clientes y un solo servidor que tiene que asignarles tareas despues de que el cliente le solicite.
+* servidores: permanecen inactivos hasta que un cliente les solicita algo.
+* clientes: realizan su trabajo de manera independiente, hasta que necesitan algo de un servidor, ahí realizan una solicitud y esperan hasta que el servidor les responda.
+
+PRODUCTORES Y CONSUMIDORES
+- se arman grupos donde, por ej, dos robots juntan los papeles de una avenida y los depositan para que dos robots consumidores las junten. 
+- finaliza el programa dsp de realizar X intentos
+* productores: trabajan para generar algun recurso y almacenarlo en un espacio compartido;
+* consumidores: utilizan los recursos generados por los productores para realizar su trabajo.
+
+SINCRONIZACION BARRERA
+- trabajan en simultaneo varios robots, y en etapas: inician juntos y cuando todos completan una etapa pueden avanzar a la siguiente. 
+- se tienen que enviar mensajes entre ellos para ir avisandose cuando cada uno termino. 
+
+JEFE Y TRABAJADORES - MASTER/SLAVE
+- un robot jefe asigna tareas a los trabajadores. los trabajadores tienen que esperar a recibir las tareas para comenzar, una vez que ya terminaron, deben avisarle al jefe que ya completaron y quedan esperando una nueva tarea.
+- la diferencia con cliente-servidor es que en este caso el que asigna tareas es el jefe, los trabajadores no lo solicitan.
+* master: deriva tareas a otros procesos (trabajadores). Determina todo, cant de trabajadores, como les reparte las tareas, como recibe los resultados.
+* slaves: realizan la tarea solicitada y envian el resultado al jefe, quedando a la espera de la siguiente tarea.
+
+PASSING THE BATON
+- múltiples procesos se ejecutan a la vez, pero solo UN PROCESO A LA VEZ (el que posee el baton) se mantiene activo. Cuando este completa su tarea, le entrega el baton a otro y queda a la espera hasta volver a recibirlo.
+- van pasando el mando (baton) uno a uno hasta completar las tareas. 
+

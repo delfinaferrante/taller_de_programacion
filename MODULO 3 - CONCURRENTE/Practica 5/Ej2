@@ -1,0 +1,100 @@
+programa repasoP5Ej2
+procesos
+  proceso juntarTodasLasFlores(ES flores:numero)
+  comenzar
+    Pos(10,10)
+    mientras(HayFlorEnLaEsquina)
+      tomarFlor
+      flores:= flores + 1
+  fin
+  proceso irADepositarFlores(ES flores:numero; E av:numero; E calle:numero)
+  comenzar
+    BloquearEsquina(10,10)
+    Pos(10,10)
+    mientras(flores > 0)
+      depositarFlor
+      flores:= flores - 1
+    Pos(av,calle)
+    LiberarEsquina(10,10)
+  fin
+  proceso juntarFlores(ES flores:numero)
+  comenzar
+    mientras(HayFlorEnLaEsquina)
+      tomarFlor
+      flores:= flores + 1
+  fin
+areas
+  area1: AreaP (1,1,100,1)
+  area2: AreaP (1,2,100,2)
+  area3: AreaP (1,3,100,3)
+  areajefe: AreaP (1,4,1,4)
+  deposito: AreaC (10,10,10,10)
+robots
+  robot recolectores
+  variables
+    esquinas, flores:numero
+    av,calle:numero
+    id,aux:numero
+  comenzar 
+    flores:= 0
+    RecibirMensaje(id,jefe)
+    derecha
+    mientras(PosAv < 100)
+      esquinas:= 0
+      mientras(esquinas < 10)
+        si(HayFlorEnLaEsquina)
+          juntarFlores(flores)
+        si(PosAv < 100)
+          mover
+        esquinas:= esquinas + 1
+      av:= PosAv
+      calle:= PosCa
+      irADepositarFlores(flores,av,calle)
+      si(id = 1)
+        EnviarMensaje(1,r2)
+        EnviarMensaje(1,r3)
+        RecibirMensaje(aux,r2)
+        RecibirMensaje(aux,r3)
+      sino
+        si(id = 2)
+          EnviarMensaje(2,r1)
+          EnviarMensaje(2, r3)
+          RecibirMensaje(aux,r1)
+          RecibirMensaje(aux,r3)
+        sino
+          EnviarMensaje(3,r1)
+          EnviarMensaje(3, r2)
+          RecibirMensaje(aux,r1)
+          RecibirMensaje(aux,r2)
+    EnviarMensaje(id, jefe) {avisa que ya termino toda la calle}
+  fin
+  robot fiscalizador
+  variables
+    id,cantTotal:numero
+  comenzar 
+    cantTotal:= 0
+    EnviarMensaje(1, r1)
+    EnviarMensaje(2, r2)
+    EnviarMensaje(3, r3)
+    repetir 3
+      RecibirMensaje(id,*)
+    juntarTodasLasFlores(cantTotal)
+    Informar(cantTotal)
+  fin
+variables
+  r1,r2,r3: recolectores
+  jefe: fiscalizador
+comenzar
+  AsignarArea(r1, area1)
+  AsignarArea(r2, area2)
+  AsignarArea(r3, area3)
+  AsignarArea(jefe, areajefe)  
+  AsignarArea(r1, deposito)
+  AsignarArea(r2, deposito)
+  AsignarArea(r3, deposito)
+  AsignarArea(jefe, deposito)  
+  Iniciar(r1, 1,1)
+  Iniciar(r2, 1,2)
+  Iniciar(r3, 1,3)
+  Iniciar(jefe, 1,4)
+fin

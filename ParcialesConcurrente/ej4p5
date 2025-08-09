@@ -1,0 +1,79 @@
+programa P5Ej4
+procesos
+  proceso irABuscarFlores(ES flores:numero)
+  comenzar
+    BloquearEsquina(10,10)
+    Pos(10,10)
+    mientras(HayFlorEnLaEsquina)
+      tomarFlor
+      flores:= flores + 1
+    Pos(1,5)
+    LiberarEsquina(10,10)
+  fin
+  proceso vaciarBolsa
+  comenzar
+    mientras(HayFlorEnLaBolsa)
+      depositarFlor
+  fin
+  proceso irADeposito(E av:numero; E ca:numero)
+  comenzar
+    BloquearEsquina(10,10)
+    Pos(10,10)
+    vaciarBolsa
+    Pos(av,ca)
+    LiberarEsquina(10,10)
+  fin
+  proceso tomarUnaFlor(ES flores:numero)
+  comenzar
+    si(HayFlorEnLaEsquina)
+      tomarFlor
+      flores:= flores + 1
+  fin
+areas
+  ciudad: AreaC (1,1,100,100)
+robots
+  robot recolectores
+  variables
+    flores,esquinas,av,ca:numero
+  comenzar
+    derecha
+    mientras(PosAv < 100)
+      flores:= 0
+      esquinas:= 0
+      mientras(flores < 10)||(esquinas < 15)
+        si(PosAv < 100)
+          mover
+        tomarUnaFlor(flores)
+        esquinas:= esquinas + 1
+      av:= PosAv
+      ca:= PosCa
+      irADeposito(av,ca)
+      EnviarMensaje(F, r3)
+    EnviarMensaje(V, r3) {termino de recorrer toda la calle}
+  fin
+  robot cosechador
+  variables
+    ok:boolean
+    terminaron,flores:numero
+  comenzar
+    terminaron:= 0
+    flores:= 0
+    mientras(terminaron < 2)
+      RecibirMensaje(ok, *)
+      si(ok = F)  {si es falso significa que deposito pero no termino}
+        irABuscarFlores(flores)
+      sino
+        terminaron:= terminaron + 1
+    Informar(flores)
+  fin
+variables
+  r1,r2: recolectores
+  r3: cosechador
+comenzar
+  AsignarArea(r1, ciudad)
+  AsignarArea(r2, ciudad)
+  AsignarArea(r3, ciudad)
+  Iniciar(r1, 1,3)
+  Iniciar(r2, 1,4)
+  Iniciar(r3, 1,5)
+fin

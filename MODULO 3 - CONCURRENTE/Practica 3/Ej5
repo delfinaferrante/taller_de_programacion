@@ -1,0 +1,73 @@
+programa Ej5
+areas
+  ciudad: AreaPC (4,1,11,100)
+  areaJefe: AreaP(1,1,1,1)
+robots
+  robot corredores
+  variables
+    hayPapeles:boolean
+    avActual,calleActual,id,movimientos:numero
+  comenzar
+    movimientos:= 0
+    hayPapeles:= V
+    RecibirMensaje(id,jefe)
+    avActual:= PosAv
+    mientras(hayPapeles)&(movimientos < 99)
+      calleActual:= PosCa
+      BloquearEsquina(11,11)
+      Pos(11,11)
+      si(HayPapelEnLaEsquina)
+        tomarPapel   
+      sino
+        hayPapeles:= F
+      Pos(avActual,calleActual)
+      LiberarEsquina(11,11)
+      si(hayPapeles)&(movimientos<99)
+        depositarPapel
+        mover
+        movimientos:= movimientos+1
+      sino
+        EnviarMensaje(id,jefe)        
+        EnviarMensaje(PosCa,jefe)
+  fin
+  robot coordinador
+  variables
+    id,calle,maxCalle,maxId:numero
+  comenzar
+    maxCalle:= -1
+    EnviarMensaje(1,r1)
+    EnviarMensaje(2,r2)
+    EnviarMensaje(3,r3)
+    EnviarMensaje(4,r4)
+    repetir 3
+      RecibirMensaje(id,*)
+      si(id = 1)
+        RecibirMensaje(calle,r1)
+      sino
+        si(id = 2)
+          RecibirMensaje(calle,r2)
+        sino
+          si(id = 3)
+            RecibirMensaje(calle,r3)
+          sino
+            RecibirMensaje(calle,r4)     
+      si(calle > maxCalle)
+        maxCalle:= calle
+        maxId:= id
+    Informar(maxId)
+  fin
+variables
+  r1,r2,r3,r4: corredores
+  jefe: coordinador
+comenzar
+  AsignarArea(jefe, areaJefe)
+  AsignarArea(r1, ciudad)
+  AsignarArea(r2, ciudad)
+  AsignarArea(r3, ciudad)
+  AsignarArea(r4, ciudad)
+  Iniciar(jefe, 1,1)
+  Iniciar(r1, 4,1)
+  Iniciar(r2, 6,1)
+  Iniciar(r3, 8,1)
+  Iniciar(r4, 10,1)
+fin

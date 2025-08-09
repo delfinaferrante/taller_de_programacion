@@ -1,0 +1,165 @@
+programa parcial2
+procesos
+  proceso juntarPapeles(ES papeles:numero)
+  comenzar
+    mientras(HayPapelEnLaEsquina)
+      tomarPapel
+      papeles:= papeles + 1
+  fin
+  proceso juntarFlores(ES flores:numero)
+  comenzar
+    mientras(HayFlorEnLaEsquina)
+      tomarFlor
+      flores:= flores + 1
+  fin
+  proceso hacerBase(ES loQueJunta:numero; ES av:numero; ES calle:numero; E juntaPapeles:boolean)
+  comenzar
+    repetir 10
+      si ~(juntaPapeles)&(HayFlorEnLaEsquina)
+        juntarFlores(loQueJunta)
+      sino
+        si(juntaPapeles)&(HayPapelEnLaEsquina)
+          juntarPapeles(loQueJunta)
+      BloquearEsquina(av, calle)
+      mover
+      av:= PosAv
+      mover
+      LiberarEsquina(av,calle)
+  fin
+  proceso hacerLado(ES loQueJunta:numero; ES av:numero; ES calle:numero; E juntaPapeles:boolean)
+  comenzar
+    repetir 10
+      si ~(juntaPapeles)&(HayFlorEnLaEsquina)
+        juntarFlores(loQueJunta)
+      sino
+        si(juntaPapeles)&(HayPapelEnLaEsquina)
+          juntarPapeles(loQueJunta)
+      BloquearEsquina(av,calle)
+      mover
+      calle:= PosCa
+      mover
+      LiberarEsquina(av,calle)
+  fin
+  proceso cuadradoPapeleros(ES papeles:numero)
+  variables
+    av,calle:numero
+    juntaPapeles:boolean
+  comenzar
+    juntaPapeles:= V
+    av:= PosAv
+    calle:= PosCa
+    calle:= calle-1
+    hacerLado(papeles,av,calle,juntaPapeles)
+    {hacerLado(papeles,av,(calle-1),juntaPapeles)}
+    derecha
+    av:= av-1
+    hacerBase(papeles,av,calle,juntaPapeles)
+    {hacerBase(papeles,(av-1),calle,juntaPapeles)}
+    derecha
+    calle:= calle + 1
+    hacerLado(papeles,av,calle,juntaPapeles)
+    {hacerLado(papeles,av,(calle+1),juntaPapeles)}
+    av:= av+1
+    hacerBase(papeles,av,calle,juntaPapeles)
+    {hacerBase(papeles,(av+1),calle,juntaPapeles)}
+  fin
+  proceso cuadradoFloreros(ES flores:numero)
+  variables
+    av,calle: numero
+    juntaPapeles:boolean
+  comenzar
+    juntaPapeles:= F
+    av:= PosAv
+    calle:= PosCa
+    calle:= calle+1
+    hacerLado(flores,av,calle,juntaPapeles)
+   { hacerLado(flores,av,(calle+1),juntaPapeles)}
+    derecha
+    av:= av+1
+    hacerBase(flores,av,calle,juntaPapeles)
+   { hacerBase(flores,(av+1),calle,juntaPapeles)}
+    derecha
+    calle:= calle-1
+    hacerLado(flores,av,calle,juntaPapeles)
+    av:= av-1
+    hacerBase(flores,av,calle,juntaPapeles)
+   { hacerLado(flores,av,(calle-1),juntaPapeles)}
+    {hacerBase(flores,(av-1),calle,juntaPapeles)}
+  fin
+  proceso enviarMensajes
+  comenzar
+    EnviarMensaje(1, florero1) {num equipo}
+    EnviarMensaje(1, florero2)
+    EnviarMensaje(2, papelero1)
+    EnviarMensaje(2, papelero2)
+    EnviarMensaje(1, florero1) {IDS}
+    EnviarMensaje(2, florero2)
+    EnviarMensaje(3, papelero1)
+    EnviarMensaje(4,papelero2)
+  fin
+areas
+  ciudad: AreaC (1,1,100,100)
+robots
+  robot papeleros
+  variables
+    papeles, numEquipo,id:numero
+  comenzar 
+    papeles:= 0
+    RecibirMensaje(numEquipo, fiscal)
+    RecibirMensaje(id, fiscal)
+    cuadradoPapeleros(papeles)
+    EnviarMensaje(numEquipo, fiscal)    {avisa que termino de recorrer el cuadrado}
+    EnviarMensaje(papeles, fiscal)      {total de papeles juntados} 
+  fin
+  robot floreros
+  variables
+    flores,numEquipo,id:numero
+  comenzar
+    flores:= 0
+    RecibirMensaje(numEquipo, fiscal)
+    RecibirMensaje(id, fiscal)
+    cuadradoFloreros(flores)
+    EnviarMensaje(numEquipo, fiscal)   {avisa que termino de recorrer el cuadrado}
+    EnviarMensaje(flores, fiscal)      {total de flores juntadas} 
+  fin 
+  robot fiscalizador
+  variables
+    equipo,flores,papeles,cantTotal,llegaron,equipoGanador:numero
+  comenzar
+    cantTotal:= 0
+    llegaron:= 0
+    enviarMensajes
+    mientras(llegaron <> 2)
+      RecibirMensaje(equipo,*)
+      si(equipo = 1)
+        llegaron:= llegaron + 1       
+        si(llegaron = 2)
+          equipoGanador:= equipo
+      sino
+        si(equipo = 2)
+          llegaron:= llegaron + 1
+          si(llegaron = 2)
+            equipoGanador:= equipo
+    
+    repetir 4
+      RecibirMensaje(aux, *)
+      cantTotal:= cantTotal + aux
+    Informar(cantTotal)
+    Informar(equipoGanador)
+  fin     
+variables
+  papelero1,papelero2: papeleros
+  florero1,florero2: floreros
+  fiscal: fiscalizador
+comenzar
+  AsignarArea(florero1, ciudad)
+  AsignarArea(papelero1, ciudad)
+  AsignarArea(florero2, ciudad)
+  AsignarArea(papelero2, ciudad)
+  AsignarArea(fiscal, ciudad)
+  Iniciar(florero1, 3,3)
+  Iniciar(papelero1, 13,13)
+  Iniciar(florero2, 16,3)
+  Iniciar(papelero2, 26,13)
+  Iniciar(fiscal, 14,6)
+fin

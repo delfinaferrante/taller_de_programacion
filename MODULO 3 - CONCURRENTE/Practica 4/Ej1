@@ -1,0 +1,120 @@
+programa Ej1
+procesos
+  proceso depositarFlores(ES cantFlores:numero)
+  comenzar
+    mientras(cantFlores <> 0)&(HayFlorEnLaBolsa)
+      depositarFlor
+      cantFlores:= cantFlores-1
+  fin
+  proceso irADepositar(E av:numero; E calleSig:numero; ES flores:numero; E avInicio:numero; E calleInicio:numero)
+  comenzar
+    BloquearEsquina(av,calleSig)
+    Pos(av,calleSig)
+    depositarFlores(flores)
+    Pos(avInicio,calleInicio)
+    LiberarEsquina(av,calleSig)
+  fin
+  proceso juntarFlores(ES cantFlores:numero)
+  comenzar
+    mientras(HayFlorEnLaEsquina)&(cantFlores > 0)
+      tomarFlor
+      cantFlores:= cantFlores-1
+  fin
+areas
+  ciudad: AreaC (1,1,3,100)
+  areaServidor: AreaP (100,100,100,100)
+robots
+  robot clientes
+  variables
+    avAct,calleSig,cantFlores,id: numero
+    ok:boolean
+  comenzar
+    RecibirMensaje(id, rservidor)
+    avAct:= PosAv
+    calleSig:= PosCa+1
+    mientras(PosCa < 100)
+      Random(cantFlores,1,4)
+      EnviarMensaje(id, rservidor)
+      EnviarMensaje(cantFlores, rservidor)
+      EnviarMensaje(avAct, rservidor)
+      EnviarMensaje(calleSig, rservidor)
+      RecibirMensaje(ok,rservidor)
+      Pos(avAct,calleSig)
+      juntarFlores(cantFlores)
+      mientras(PosCa < 100)&(cantFlores > 0)
+        mover
+        depositarFlor
+        cantFlores:= cantFlores-1
+
+    EnviarMensaje(0,rservidor)  
+  fin
+  robot servidor
+  variables
+    id,av,calleSig,avInicio,calleInicio,cantFlores,robotsCompletos,valor:numero
+    ok:boolean
+  comenzar
+    robotsCompletos:= 0
+    avInicio:= PosAv
+    calleInicio:= PosCa
+    EnviarMensaje(1,cliente1)
+    EnviarMensaje(2,cliente2)
+    EnviarMensaje(3,cliente3)
+    mientras(robotsCompletos < 3)
+      RecibirMensaje(id,*)
+      si(id = 1)
+        RecibirMensaje(cantFlores,cliente1)
+        mientras(HayFlorEnLaEsquina)
+          tomarFlor
+          cantFlores:= cantFlores+1
+        si(cantFlores <> 0)
+          RecibirMensaje(av,cliente1)
+          RecibirMensaje(calleSig,cliente1)
+          irADepositar(av,calleSig,cantFlores,avInicio,calleInicio)
+          ok:= V
+          EnviarMensaje(ok,cliente1)
+          RecibirMensaje(valor, cliente1)
+        sino
+          si(valor = 0)
+            robotsCompletos:= robotsCompletos + 1
+          
+      sino
+        si(id = 2)
+          RecibirMensaje(cantFlores,cliente2)
+          si(cantFlores <> 0)
+            RecibirMensaje(av,cliente2)
+            RecibirMensaje(calleSig,cliente2)
+            irADepositar(av,calleSig,cantFlores,avInicio,calleInicio)
+            ok:= V
+            EnviarMensaje(ok,cliente2)
+            RecibirMensaje(valor, cliente2)
+          sino
+            si(valor = 0)
+              robotsCompletos:= robotsCompletos + 1
+            
+        sino
+          RecibirMensaje(cantFlores,cliente3)
+          si(cantFlores <> 0)
+            RecibirMensaje(av,cliente3)
+            RecibirMensaje(calleSig,cliente3)
+            irADepositar(av,calleSig,cantFlores,avInicio,calleInicio)
+            ok:= V
+            EnviarMensaje(ok,cliente3)
+            RecibirMensaje(valor, cliente3)
+          sino
+            si(valor = 0)
+              robotsCompletos:= robotsCompletos + 1      
+  fin
+variables
+  cliente1,cliente2,cliente3: clientes
+  rservidor: servidor
+comenzar
+  AsignarArea(cliente1, ciudad)
+  AsignarArea(cliente2, ciudad)
+  AsignarArea(cliente3, ciudad)
+  AsignarArea(rservidor, areaServidor)
+  AsignarArea(rservidor,ciudad)
+  Iniciar(cliente1, 1,1)
+  Iniciar(cliente2, 2,1)
+  Iniciar(cliente3, 3,1)
+  Iniciar(rservidor, 100,100)
+fin

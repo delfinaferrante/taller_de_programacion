@@ -1,0 +1,134 @@
+programa parcial3
+procesos
+  proceso juntarFlores(ES flores:numero)
+  comenzar
+    mientras(HayFlorEnLaEsquina)
+      tomarFlor
+      flores:= flores + 1
+  fin
+  proceso dejarFlores(ES flores:numero)
+  comenzar
+    si(HayFlorEnLaBolsa)
+      depositarFlor
+      flores:= flores - 1
+  fin
+  proceso irADepositar(ES flores:numero; E av:numero; E calle:numero; E tamaño:numero)
+  comenzar
+    BloquearEsquina(50,50)
+    Pos(50,50)
+    mientras(flores > 0)
+      dejarFlores(flores)
+    Pos(av,(calle+(tamaño+1)))
+    LiberarEsquina(50,50) 
+  fin
+  proceso hacerLados(E tamaño:numero;ES flores:numero)
+  comenzar
+    repetir tamaño
+      mover
+      si(HayFlorEnLaEsquina)
+        juntarFlores(flores)
+  fin
+  proceso hacerCuadrado(E tamaño:numero; ES flores:numero)
+  comenzar
+    repetir 4
+      hacerLados(tamaño,flores)
+      derecha   
+  fin
+areas
+  ciudad: AreaC (1,1,100,100)
+robots
+  robot coordinador
+  variables
+    av,calle:numero
+    tamaño, id:numero
+    maxFlores,maxId:numero
+    f1,f2,f3,aux:numero
+  comenzar
+    f1:= 0
+    f2:= 0
+    f3:= 0
+    aux:= 0
+    maxFlores:= 0
+    av:= PosAv
+    calle:= PosCa
+    EnviarMensaje(1,recolector1)
+    EnviarMensaje(2,recolector2)
+    EnviarMensaje(3,recolector3)
+    
+    Random(tamaño,1,6)
+    EnviarMensaje(tamaño,recolector1)
+    Random(tamaño,1,6)
+    EnviarMensaje(tamaño,recolector2)
+    Random(tamaño,1,6)
+    EnviarMensaje(tamaño,recolector3)
+    repetir 9
+      RecibirMensaje(id, *)
+      si(id = 1)
+        BloquearEsquina(50,50)
+        Pos(50,50)
+        juntarFlores(aux)
+        Pos(av,calle)
+        LiberarEsquina(50,50)
+        EnviarMensaje(id,recolector1)          
+        f1:= f1 + aux
+      sino
+        si(id = 2)
+          BloquearEsquina(50,50)        
+          Pos(50,50)
+          juntarFlores(aux)
+          Pos(av,calle)
+          LiberarEsquina(50,50)
+          EnviarMensaje(id,recolector2)            
+          f2:= f2 + aux
+        sino
+          BloquearEsquina(50,50)
+          Pos(50,50)        
+          juntarFlores(aux)
+          Pos(av,calle)
+          LiberarEsquina(50,50)
+          EnviarMensaje(id,recolector3)                     
+          f3:= f3 + aux
+
+    repetir 2
+      si(f1 > maxFlores)
+        maxFlores:= f1
+        maxId:= 1
+      si(f2 > maxFlores)
+        maxFlores:= f2
+        maxId:= 2
+      sino
+        si(f3 > maxFlores)
+          maxFlores:= f3
+          maxId:= 3
+    Informar('r0b0t',maxId)
+    Informar(maxFlores)
+  fin
+  robot recolectores
+  variables
+    id,tamaño,flores:numero
+    av,calle:numero
+  comenzar
+    flores:= 0
+    av:= PosAv
+    RecibirMensaje(id, jefe)
+    RecibirMensaje(tamaño, jefe)
+    repetir 3
+      calle:= PosCa
+      hacerCuadrado(tamaño,flores)
+      irADepositar(flores, av, calle, tamaño)
+      EnviarMensaje(id, jefe)  {avisa para q recoja las flores q deposito recien}
+      RecibirMensaje(id, jefe) {para q no deposite otro antes de que recoja el jefe}
+  fin
+variables
+  recolector1, recolector2, recolector3: recolectores
+  jefe: coordinador
+comenzar
+  AsignarArea(recolector1, ciudad)
+  AsignarArea(recolector2, ciudad)
+  AsignarArea(recolector3, ciudad)
+  AsignarArea(jefe, ciudad)
+  Iniciar(recolector1, 1,1)
+  Iniciar(recolector2, 10,1)
+  Iniciar(recolector3, 20,1)
+  Iniciar(jefe, 100,100)
+fin

@@ -1,0 +1,104 @@
+programa ejemplo
+procesos
+  proceso dejarUnaFlor(ES flores:numero)
+  comenzar
+    depositarFlor
+    flores:= flores - 1
+  fin
+  proceso depositarFlores(E flores:numero)
+  comenzar
+    mientras(flores > 0)
+      dejarUnaFlor(flores)
+  fin
+  proceso juntoLasFlores(ES flores:numero)
+  comenzar
+    mientras(HayFlorEnLaEsquina)
+      tomarFlor
+      flores:= flores + 1
+  fin
+  proceso hacerLado(E tamaño:numero; ES flores:numero)
+  comenzar
+    repetir tamaño
+      si(HayFlorEnLaEsquina)
+        juntoLasFlores(flores)
+      mover
+  fin
+  proceso hacerCuadrado(E tamaño:numero; ES flores:numero)
+  comenzar
+    repetir 4
+      hacerLado(tamaño,flores)
+      derecha   
+  fin
+areas
+  ciudad: AreaC (1,1,100,100)
+robots
+  robot armadores
+  variables
+    tamaño,cuadrados,flores,av,calle,id:numero
+  comenzar
+    cuadrados:= 0
+    flores:= 0
+    av:= PosAv
+    calle:= PosCa
+    RecibirMensaje(id, jefe)
+    mientras(cuadrados < 3)
+      Random(tamaño,1,4)
+      hacerCuadrado(tamaño,flores)
+      cuadrados:= cuadrados + 1
+      BloquearEsquina(50,50)    
+      Pos(50,50)
+      depositarFlores(flores)
+      calle:= calle+(tamaño+1)
+      Pos(av, calle)
+      LiberarEsquina(50,50)
+      EnviarMensaje(id, jefe)
+      EnviarMensaje(tamaño, jefe)  {para sacar los movimientos q hizo en total}
+  fin
+  robot fiscalizador
+  variables
+    cuadrados, maxMov, maxID, mov, mov1,mov2,mov3,id:numero
+  comenzar
+    cuadrados:= 0
+    EnviarMensaje(1, r1)
+    EnviarMensaje(2, r2)
+    EnviarMensaje(3, r3)
+    mientras(cuadrados <> 9)
+      RecibirMensaje(id, *)
+      si(id = 1)
+        RecibirMensaje(mov, r1)
+        mov1:= mov1 + mov
+        cuadrados:= cuadrados + 1
+      sino
+        si(id = 2)
+          RecibirMensaje(mov, r2)
+          mov2:= mov2 + mov
+          cuadrados:= cuadrados + 1
+        sino
+          RecibirMensaje(mov, r3)
+          mov3:= mov3 + mov
+          cuadrados:= cuadrados + 1
+      si(mov1 > mov2)
+        maxMov:= mov1
+        maxID:= 1
+      sino
+        maxMov:= mov2
+        maxID:= 2
+      si(mov3 > maxMov)
+        maxMov:= mov3
+        maxID:= 1
+    Informar('el que mas recorrio fue',maxID)
+    Informar(maxMov)
+  fin
+variables
+  r1,r2,r3: armadores
+  jefe: fiscalizador
+comenzar
+  AsignarArea(r1, ciudad)
+  AsignarArea(r2, ciudad)
+  AsignarArea(r3, ciudad)
+  AsignarArea(jefe, ciudad)
+  Iniciar(r1, 1,1)
+  Iniciar(r2, 7,1)
+  Iniciar(r3, 14,1)
+  Iniciar(jefe, 51,51)
+fin

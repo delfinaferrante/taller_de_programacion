@@ -1,0 +1,125 @@
+programa Ej6A
+procesos
+  proceso depositar(E juntaFlores:boolean; E loQueDeposita:numero)
+  comenzar
+    derecha
+    mientras(loQueDeposita > 1)&(PosCa < 99)
+      si(juntaFlores)
+        depositarFlor
+        mover
+        loQueDeposita:= loQueDeposita-1
+  fin
+  proceso juntarFlores(ES flores:numero)
+  comenzar
+    mientras(HayFlorEnLaEsquina)
+      tomarFlor
+      flores:= flores+1
+  fin
+  proceso hacerCuadrado(E lado:numero;ES flores:numero; ES papeles:numero)
+  comenzar
+    si(lado = 6)
+      papeles:= -1
+      repetir lado
+        juntarFlores(flores)
+        mover
+      derecha
+    si(lado = 10)
+    si(lado = 7)
+
+  fin
+areas 
+  ciudad: AreaC (1,1,100,100)
+robots
+  robot recolectores
+  variables
+    lado,id,calle,flores,papeles:numero
+  comenzar
+    RecibirMensaje(id,fiscalizador)
+    si(PosAv = 2)   
+      lado:= 6
+      flores:= 0
+      repetir 4
+        hacerCuadrado(lado, flores, papeles)
+    sino
+      si(PosAv = 5)
+        lado:= 10
+        flores:= 0
+        papeles:= 0
+        repetir 4
+          hacerCuadrado(lado,flores,papeles)
+    sino
+      si(PosAv = 9)
+        lado:= 7
+        papeles:= 0
+        repetir 4
+          hacerCuadrado(lado,flores,papeles)
+          
+    EnviarMensaje(id,fiscalizador)
+    RecibirMensaje(calle, fiscalizador)
+    Pos(1,calle)
+    depositar(juntaFlores,flores)
+  fin
+  robot tipo2
+  variables
+    lado,flores,papeles:numero
+    juntaFloresYPapeles:boolean
+  comenzar
+    RecibirMensaje(id,fiscalizador)
+    lado:= 10
+    flores:= 0
+    papeles:= 0
+    juntaFloresYPapeles:= V
+    repetir 4
+      hacerCuadrado(lado,
+  fin
+  robot jefe
+  variables
+    id,calle, posicion:numero
+  comenzar
+    EnviarMensaje(1,r1)
+    EnviarMensaje(2,r2)
+    EnviarMensaje(3,r3)
+    calle:= 20
+    posicion:= 1
+    repetir 3
+      RecibirMensaje(id,*)
+      si(id = 1)
+        si(pos = 1)
+          EnviarMensaje(calle, r1)
+        sino
+          si(pos = 2)
+            EnviarMensaje(calle+1,r1)
+          sino
+            EnviarMensaje(calle+2,r1)
+      sino
+        si(id = 2)
+          si(pos = 1)
+            EnviarMensaje(calle, r2)
+          sino
+            si(pos = 2)
+              EnviarMensaje(calle+1,r2)
+            sino
+              EnviarMensaje(calle+2,r2)
+      sino
+        si(pos = 1)
+          EnviarMensaje(calle, r3)
+        sino
+          si(pos = 2)
+            EnviarMensaje(calle+1,r3)
+          sino
+            EnviarMensaje(calle+2,r3)      
+      pos:= pos+1 {una vez q recibi un robot, aumento pos para saber la sig posicion}   
+  fin
+variables
+  r1, r2, r3: recolectores
+  fiscalizador: jefe
+comenzar
+  AsignarArea(r1, ciudad)
+  AsignarArea(r2,ciudad)
+  AsignarArea(r3,ciudad)
+  AsignarArea(fiscalizador,ciudad)
+  Iniciar(r1, 2,2)
+  Iniciar(r2, 5,5)
+  Iniciar(r3,9,9)
+  Iniciar(fiscalizador,1,1)
+fin

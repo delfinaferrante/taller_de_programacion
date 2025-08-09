@@ -1,0 +1,191 @@
+programa parcial5
+procesos
+  proceso depositarUnPapel(ES papeles:numero)
+  comenzar
+    depositarPapel
+    papeles:= papeles - 1
+  fin
+  proceso etapaFinal(E id:numero;ES papeles:numero; E avInicio:numero; E calleInicio:numero)
+  variables
+    aux:numero
+  comenzar
+    si(id = 1)
+      EnviarMensaje(1,corredor2)
+      EnviarMensaje(1,corredor3)
+      EnviarMensaje(1,corredor4)
+      RecibirMensaje(aux,*)
+    sino
+      si(id = 2)
+        EnviarMensaje(2,corredor1)
+        EnviarMensaje(2,corredor3)
+        EnviarMensaje(2,corredor4)
+        RecibirMensaje(aux,*)
+      sino
+        si(id = 3)
+          EnviarMensaje(3,corredor1)
+          EnviarMensaje(3,corredor2)
+          EnviarMensaje(3,corredor4)
+          RecibirMensaje(aux,*)
+        sino
+          EnviarMensaje(4,corredor1)
+          EnviarMensaje(4,corredor2)
+          EnviarMensaje(4,corredor3)
+          RecibirMensaje(aux,*)
+    repetir 2
+      derecha
+    mientras(PosAv >= 2)
+      si(HayPapelEnLaEsquina)
+        tomarPapel
+        papeles:= papeles + 1
+      mover
+    BloquearEsquina(1,6)
+    Pos(1,6)
+    mientras(papeles > 0)
+      depositarUnPapel(papeles)
+    EnviarMensaje(id, jefe) 
+    Pos(avInicio,calleInicio)
+    LiberarEsquina(1,6)
+  fin
+  proceso depositarLasFlores(ES flores:numero)
+  comenzar
+    depositarFlor
+    flores:= flores - 1
+  fin
+  proceso clasificacion(ES flores:numero; ES id:numero)
+  variables
+    calle:numero
+  comenzar
+    derecha
+    mover
+    RecibirMensaje(id, jefe)
+    mientras(PosAv <= 20)
+      si(HayFlorEnLaEsquina)
+        tomarFlor
+        flores:= flores + 1
+      mover
+    calle:= PosCa
+    BloquearEsquina(1,6)
+    Pos(1,6)
+    mientras(flores > 0)
+      depositarLasFlores(flores)
+    EnviarMensaje(id, jefe)
+    Pos(20,calle)
+    LiberarEsquina(1,6)
+  fin
+  proceso vaciarBolsaPapeles
+  comenzar
+    mientras(HayPapelEnLaBolsa)
+      depositarPapel
+  fin
+  proceso vaciarBolsaFlores
+  comenzar
+    mientras(HayFlorEnLaBolsa)
+      depositarFlor
+  fin
+  proceso vaciarBolsa
+  comenzar
+    si(HayFlorEnLaBolsa)
+      vaciarBolsaFlores
+    si(HayPapelEnLaBolsa)
+      vaciarBolsaPapeles
+  fin
+  proceso enviarMensajes
+  comenzar
+    EnviarMensaje(1,corredor1)
+    EnviarMensaje(2,corredor2)
+    EnviarMensaje(3,corredor3)
+    EnviarMensaje(4,corredor4)   
+  fin 
+areas
+  ciudad: AreaC (1,1,100,100)
+robots
+  robot corredores
+  variables
+    flores,papeles,id:numero
+    avInicio,calleInicio:numero
+    pasaFinal:boolean
+  comenzar
+    avInicio:= PosAv
+    calleInicio:= PosCa
+    vaciarBolsa
+    flores:= 0
+    papeles:= 0
+    clasificacion(flores,id)
+    RecibirMensaje(pasaFinal, jefe) {si recibe V es porque fue uno de los dos primeros}
+    si(id = 1)&(pasaFinal)
+      etapaFinal(id,papeles,avInicio,calleInicio)
+    sino
+      si(id = 2)&(pasaFinal)
+        etapaFinal(id,papeles,avInicio,calleInicio)
+      sino
+        si(id = 3)&(pasaFinal)
+          etapaFinal(id,papeles,avInicio,calleInicio)
+        sino
+          si(id = 4)&(pasaFinal)
+            etapaFinal(id,papeles,avInicio,calleInicio)
+  fin
+  
+  robot fiscalizador
+  variables
+    idPasan, idNoPasan, idGanador,idPerdedor:numero
+  comenzar
+    enviarMensajes
+    repetir 2
+      RecibirMensaje(idPasan, *)
+      si(idPasan = 1)
+        EnviarMensaje(V, corredor1)  {los robots q reciban V pasan a la final}
+        {EnviarMensaje(idPasan, corredor1)}
+      sino
+        si(idPasan = 2)
+          EnviarMensaje(V, corredor2)
+          {EnviarMensaje(idPasan, corredor1)}
+        sino
+          si(idPasan = 3)
+            EnviarMensaje(V, corredor3)
+            {EnviarMensaje(idPasan, corredor1)}
+          sino
+            EnviarMensaje(V, corredor4)
+            {EnviarMensaje(idPasan, corredor1)}
+            
+    repetir 2
+      RecibirMensaje(idNoPasan,*)  {recibo los otros dos mensajes y les mando F porque no pasan a la final}
+      si(idNoPasan = 1)
+        EnviarMensaje(F, corredor1)  
+      sino
+        si(idNoPasan = 2)
+          EnviarMensaje(F, corredor2)
+        sino
+          si(idNoPasan = 3)
+            EnviarMensaje(F, corredor3)
+          sino
+            EnviarMensaje(F, corredor4)
+    
+    RecibirMensaje(idGanador, *)
+    si(idGanador = 1)
+      Informar('ganador',idGanador)
+    sino
+      si(idGanador = 2)
+        Informar('ganador',idGanador)
+      sino
+        si(idGanador = 3)
+          Informar('ganador',idGanador)
+        sino
+          Informar('ganador',idGanador)
+          
+    RecibirMensaje(idPerdedor, *)
+  fin
+variables
+  corredor1,corredor2,corredor3,corredor4: corredores
+  jefe: fiscalizador
+comenzar
+  AsignarArea(corredor1, ciudad)
+  AsignarArea(corredor2, ciudad)
+  AsignarArea(corredor3, ciudad)
+  AsignarArea(corredor4, ciudad)
+  AsignarArea(jefe, ciudad)
+  Iniciar(corredor1, 1,1)
+  Iniciar(corredor2, 1,2)
+  Iniciar(corredor3, 1,3)
+  Iniciar(corredor4, 1,4)
+  Iniciar(jefe, 1,5)
+fin

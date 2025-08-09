@@ -1,0 +1,109 @@
+programa parcial2
+procesos
+  proceso depositar(ES flores:numero)
+  comenzar
+    BloquearEsquina(50,50)
+    Pos(50,50)
+    mientras(flores > 0)
+      depositarFlor
+      flores:= flores - 1
+  fin
+  proceso hacerCuadrado(E tamaño:numero; ES flores:numero)
+  comenzar
+    repetir 4
+      repetir tamaño
+        mientras(HayFlorEnLaEsquina)
+          tomarFlor
+          flores:= flores + 1
+        mover
+      derecha
+  fin
+  proceso enviarTamaños
+  variables
+    tamaño:numero
+  comenzar
+    Random(tamaño, 1, 6)
+    EnviarMensaje(tamaño, r1)
+    Random(tamaño, 1, 6)
+    EnviarMensaje(tamaño, r2)
+    Random(tamaño, 1, 6)
+    EnviarMensaje(tamaño, r3)
+  fin
+  proceso enviarIds
+  comenzar
+    EnviarMensaje(1, r1)
+    EnviarMensaje(2, r2)
+    EnviarMensaje(3, r3)
+  fin
+areas
+  ciudad: AreaC (1,1,100,100)
+robots
+  robot robotitos
+  variables
+    id,tamaño, flores, avInicio, calle:numero
+  comenzar
+    RecibirMensaje(id, jefe)
+    RecibirMensaje(tamaño, jefe)
+    repetir 3
+      avInicio:= PosAv
+      calle:= PosCa
+      hacerCuadrado(tamaño,flores)
+      depositar(flores)
+      calle:= calle + tamaño
+      Pos(avInicio, calle+1)
+      LiberarEsquina(50,50)
+      EnviarMensaje(id, jefe)   {avisa al jefe que termino y puede ir a recoger}
+    EnviarMensaje(0, jefe)
+  fin
+  robot fiscalizador
+  variables
+    id,aux,f1,f2,f3, termino:numero
+  comenzar
+    f1:= 0
+    f2:= 0
+    f3:= 0
+    termino:= 0
+    enviarIds
+    enviarTamaños
+    mientras(termino < 3)
+      RecibirMensaje(id, *)
+      aux:= 0
+      BloquearEsquina(50,50)
+      Pos(50,50)
+      mientras(HayFlorEnLaEsquina)
+        tomarFlor
+        aux:= aux + 1
+      Pos(100,100)
+      LiberarEsquina(50,50)
+      si(id = 1)
+        f1:= f1 + aux
+      sino
+        si(id = 2)
+          f2:= f2 + aux
+        sino
+          si(id = 3)
+            f3:= f3 + aux
+          sino
+            termino:= termino + 1
+    si(f1 > f2)&&(f1 > f3)
+      Informar(1)
+    sino
+      si(f2 > f1)&&(f2 > f3)
+        Informar(2)
+      sino
+        si(f3 > f1)&&(f3 > f2)
+          Informar(3)
+  fin
+variables
+  r1,r2,r3: robotitos
+  jefe: fiscalizador
+comenzar
+  AsignarArea(r1, ciudad)
+  AsignarArea(r2, ciudad)
+  AsignarArea(r3, ciudad)
+  AsignarArea(jefe, ciudad)
+  Iniciar(r1, 1, 1)
+  Iniciar(r2, 10, 1)
+  Iniciar(r3, 20, 1)
+  Iniciar(jefe, 100, 100)
+fin

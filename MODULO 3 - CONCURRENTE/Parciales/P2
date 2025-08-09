@@ -1,0 +1,184 @@
+programa ejemplo
+procesos
+  proceso juntarFlores (ES f:numero)
+  comenzar
+    mientras (HayFlorEnLaEsquina)
+      tomarFlor
+      f:=f+1
+  fin
+  proceso juntarPapeles (ES p:numero)
+  comenzar
+    mientras (HayPapelEnLaEsquina)
+      tomarPapel
+      p:=p+1
+  fin
+  proceso recorridoF (ES flores:numero)
+  variables
+    calle,av,lado:numero
+  comenzar
+    calle:=PosCa
+    av:=PosAv
+    lado:=1
+    BloquearEsquina(av,calle)
+    repetir 2
+      repetir 10
+        juntarFlores(flores)
+        si (lado=1)
+          BloquearEsquina(av,(calle+1))
+        sino
+          BloquearEsquina((av+1),calle)
+        mover
+        LiberarEsquina(av,calle)
+        calle:=PosCa
+        av:=PosAv
+      derecha
+      si (lado=1)
+        lado:=2
+      sino
+        lado:=1
+    repetir 2
+      repetir 10
+        juntarFlores(flores)
+        si (lado=1)
+          BloquearEsquina(av,(calle-1))
+        sino
+          BloquearEsquina((av-1),calle)
+        mover
+        LiberarEsquina(av,calle)
+        calle:=PosCa
+        av:=PosAv
+      derecha
+      si (lado=1)
+        lado:=2
+      sino
+        lado:=1
+  fin
+  proceso recorridoP (ES papeles:numero)
+  variables
+    lado,calle,av:numero
+  comenzar
+    lado:=1
+    calle:=PosCa
+    av:=PosAv
+    BloquearEsquina(av,calle)
+    repetir 2
+      repetir 10
+        juntarPapeles(papeles)
+        si (lado=1)
+          BloquearEsquina(av,(calle-1))
+        sino
+          BloquearEsquina((av-1),calle)
+        mover
+        LiberarEsquina(av,calle)
+        calle:=PosCa
+        av:=PosAv
+      derecha
+      si (lado=1)
+        lado:=2
+      sino
+        lado:=1
+    repetir 2
+      repetir 10
+        juntarPapeles(papeles)
+        si (lado=1)
+          BloquearEsquina(av,(calle+1))
+        sino
+          BloquearEsquina((av+1),calle)
+        mover
+        LiberarEsquina(av,calle)
+        calle:=PosCa
+        av:=PosAv
+      derecha
+      si (lado=1)
+        lado:=2
+      sino
+        lado:=1
+  fin
+  proceso enviarID
+  comenzar
+    EnviarMensaje(1,r1)
+    EnviarMensaje(2,r2)
+    EnviarMensaje(3,r3)
+    EnviarMensaje(4,r4)
+  fin
+areas
+  cuadradoUno: AreaPC (3,3,13,13)
+  cuadradoDos: AreaPC (16,3,26,13)
+  oficina: AreaP (14,6,14,6)
+robots
+  robot florero
+  variables
+    flores,id:numero
+  comenzar
+    flores:=0
+    RecibirMensaje(id,rJefe)
+    recorridoF(flores)
+    EnviarMensaje(id,rJefe)
+    EnviarMensaje(flores,rJefe)
+  fin
+  robot papelero
+  variables
+    papeles,id:numero
+  comenzar
+    papeles:=0
+    derecha
+    derecha
+    RecibirMensaje(id,rJefe)
+    recorridoP(papeles)
+    EnviarMensaje(id,rJefe)
+    EnviarMensaje(papeles,rJefe)
+  fin
+  robot fiscalizador
+  variables
+    total:numero
+    f,p:numero
+    id,aux:numero
+    cant:numero
+  comenzar
+    enviarID
+    f:=0
+    p:=0
+    total:=0
+    cant:=0
+    mientras (f<>2) & (p<>2)
+      RecibirMensaje(id,*)
+      cant:=cant+1
+      si (id=1)
+        f:=f+1
+      sino
+        si (id=2)
+          f:=f+1
+        sino
+          si (id=3)
+            p:=p+1
+          sino
+            f:=f+1
+    si (cant=2)
+      repetir 2
+        RecibirMensaje(id,*)
+    sino
+      RecibirMensaje(id,*)
+    repetir 4
+      RecibirMensaje(aux,*)
+      total:=total+aux
+    si (f=2)
+      Informar("los floreros terminaron primero y se juntó en total ",total)
+    sino
+      Informar("los papeleros terminaron primero y se juntó en total ",total)
+  fin
+variables
+  r1,r2: florero
+  r3,r4: papelero
+  rJefe: fiscalizador
+comenzar
+  AsignarArea(r1, cuadradoUno)
+  AsignarArea(r2, cuadradoDos)
+  AsignarArea(r3, cuadradoUno)
+  AsignarArea(r4, cuadradoDos)
+  AsignarArea(rJefe, oficina)
+  Iniciar(r1, 3,3)
+  Iniciar(r2, 16,3)
+  Iniciar(r3, 13,13)
+  Iniciar(r4, 26,13)
+  Iniciar(rJefe, 14,6)
+fin

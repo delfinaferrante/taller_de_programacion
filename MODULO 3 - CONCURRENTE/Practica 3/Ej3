@@ -1,0 +1,85 @@
+programa Ej3
+procesos
+  proceso juntarFlor(ES flores:numero)
+  comenzar
+    si(HayFlorEnLaEsquina)
+      tomarFlor
+      flores:= flores+1
+  fin
+areas
+  ciudad: AreaC (1,1,10,10)
+robots
+  robot juntadores
+  variables
+    avInicial,calleInicial, avRandom,calleRandom,numRobot,flores:numero
+  comenzar
+    flores:= 0
+    avInicial:= PosAv
+    calleInicial:= PosCa
+    RecibirMensaje(avRandom,rjefe)
+    RecibirMensaje(calleRandom,rjefe)
+    RecibirMensaje(numRobot,rjefe)
+    
+    BloquearEsquina(avRandom,calleRandom)
+    Pos(avRandom,calleRandom)
+    juntarFlor(flores)
+    Pos(avInicial,calleInicial)
+    LiberarEsquina(avRandom,calleRandom)
+    
+    EnviarMensaje(numRobot,rjefe)
+    EnviarMensaje(flores,rjefe)
+  fin
+  robot jefe
+  variables
+    av,calle,flores,max,idMax, numRobot:numero
+  comenzar
+    max:= 0
+    Random(av,2,10)
+    Random(calle,2,10)
+    
+    EnviarMensaje(av, r1)
+    EnviarMensaje(calle,r1)
+    EnviarMensaje(1,r1)
+    
+    EnviarMensaje(av, r2)
+    EnviarMensaje(calle,r2)
+    EnviarMensaje(2,r2)
+    
+    EnviarMensaje(av, r3)
+    EnviarMensaje(calle,r3)
+    EnviarMensaje(3,r3)
+    
+    EnviarMensaje(av, r4)
+    EnviarMensaje(calle,r4)
+    EnviarMensaje(4,r4)
+    
+    repetir 4
+      RecibirMensaje(numRobot,*)
+      si(numRobot = 1)
+        RecibirMensaje(flores, r1)
+      si(numRobot = 2)
+        RecibirMensaje(flores,r2)
+      si(numRobot = 3)
+        RecibirMensaje(flores,r3)
+      si(numRobot = 4)
+        RecibirMensaje(flores,r4)
+      si(flores >= max)
+        max:= flores
+        idMax:= numRobot
+    Informar("recogio mas flores el r0b0t ", idMax)
+  fin
+variables
+  r1, r2, r3, r4: juntadores
+  rjefe: jefe
+comenzar
+  AsignarArea(r1, ciudad)
+  AsignarArea(r2,ciudad)
+  AsignarArea(r3,ciudad)
+  AsignarArea(r4,ciudad)
+  AsignarArea(rjefe,ciudad)
+  Iniciar(r1, 2, 1)
+  Iniciar(r2, 3, 1)
+  Iniciar(r3, 4, 1)
+  Iniciar(r4, 5, 1)
+  Iniciar(rjefe, 1, 1)
+fin

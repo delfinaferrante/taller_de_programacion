@@ -1,0 +1,125 @@
+programa Parcial1
+procesos
+  proceso enviarIDs
+  comenzar
+    EnviarMensaje(1, r1)
+    EnviarMensaje(2, r2)
+    EnviarMensaje(3, r3)
+    EnviarMensaje(4, r4)
+  fin
+  proceso juntarFlores(ES flores:numero)
+  comenzar
+    mientras(HayFlorEnLaEsquina)
+      tomarFlor
+      flores:= flores + 1
+  fin
+  proceso juntarPapeles(ES papeles:numero)
+  comenzar
+    mientras(HayPapelEnLaEsquina)
+      tomarPapel
+      papeles:= papeles + 1
+  fin
+  proceso posicionarseYJuntar(E avI:numero; E calleI:numero;ES flores:numero; ES papeles:numero)
+  variables
+    av,calle:numero
+  comenzar
+    Random(av, 45, 62)
+    Random(calle, 48, 69)
+    BloquearEsquina(av,calle)
+    Pos(av,calle)
+    si(HayPapelEnLaEsquina)
+      juntarPapeles(papeles)
+    si(HayFlorEnLaEsquina)
+      juntarFlores(flores)
+    Pos(avI,calleI)
+    LiberarEsquina(av,calle)
+  fin
+areas
+  ciudad: AreaC (1,1,100,100)
+robots
+  robot recolectores
+  variables
+    flores,papeles,totalJuntados:numero
+    intentos:numero
+    avInicio,calleInicio:numero
+    id: numero
+  comenzar
+    flores:= 0
+    papeles:= 0
+    intentos:= 0
+    totalJuntados:= 0
+    avInicio:= PosAv
+    calleInicio:= PosCa
+    RecibirMensaje(id, rjefe)
+    mientras(intentos < 5)
+      posicionarseYJuntar(avInicio,calleInicio,flores,papeles)
+      EnviarMensaje(id, rjefe)     {avisa que tomo flor o papel}
+      intentos:= intentos + 1
+      totalJuntados:= totalJuntados + flores + papeles
+    EnviarMensaje(id, rjefe)      {cuando termino los 5 intentos avisa al jefe}
+    EnviarMensaje(totalJuntados, rjefe)
+  fin
+  robot jefe
+  variables
+    id,total,maxJuntado,idMax:numero
+    totalIntentos,intento: numero
+  comenzar
+    maxJuntado:= -1
+    total:= 0
+    enviarIDs
+    totalIntentos:= 0
+    mientras(totalIntentos < 20)
+      RecibirMensaje(id, *) {recibe un msj para saber q algun robot junto algo}
+      si(id = 1)
+        intento:= intento + 1
+        si(intento < 5)
+          totalIntentos:= totalIntentos + 1
+      sino
+        si(id = 2)
+          intento:= intento + 1
+          si(intento < 5)
+            totalIntentos:= totalIntentos + 1
+        sino
+          si(id = 3)
+            intento:= intento + 1
+            si(intento < 5)
+              totalIntentos:= totalIntentos + 1
+          sino
+            intento:= intento + 1
+            si(intento < 5)
+              totalIntentos:= totalIntentos + 1
+      {Informar(totalIntentos)  queda loopeado en 4}
+      
+    repetir 4
+      RecibirMensaje(id, *) {si ya terminaron todos, busco max de flores/papeles}
+      si(id = 1)
+        RecibirMensaje(total, r1)
+      sino
+        si(id = 2)
+          RecibirMensaje(total, r2)
+        sino
+          si(id = 3)
+            RecibirMensaje(total, r3)
+          sino
+            RecibirMensaje(total, r4)
+      si(total > maxJuntado)
+        maxJuntado:= total
+        idMax:= id
+    Informar(idMax)
+    Informar(maxJuntado)
+  fin
+variables
+  r1,r2,r3,r4: recolectores
+  rjefe: jefe
+comenzar
+  AsignarArea(r1, ciudad)
+  AsignarArea(r2, ciudad)  
+  AsignarArea(r3, ciudad)
+  AsignarArea(r4, ciudad)
+  AsignarArea(rjefe, ciudad)
+  Iniciar(r1, 10,10)
+  Iniciar(r2, 11,10)
+  Iniciar(r3, 12,10)
+  Iniciar(r4, 13,10)
+  Iniciar(rjefe, 1,1)
+fin
